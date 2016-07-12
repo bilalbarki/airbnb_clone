@@ -6,7 +6,7 @@ AIRBNB_ENV = os.environ.get('AIRBNB_ENV')
 if AIRBNB_ENV == None:
     print "Please set AIRBNB_ENV environment variable to either production or development!"
     quit()
-elif AIRBNB_ENV != "development" or AIRBNB_ENV != "production":
+elif AIRBNB_ENV != "development" and AIRBNB_ENV != "production":
     print "AIRBNB_ENV environment variable has an unsupported value!"
     quit()
 
