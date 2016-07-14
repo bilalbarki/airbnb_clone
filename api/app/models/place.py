@@ -2,6 +2,7 @@ import base
 from peewee import *
 from user import *
 from city import *
+from playhouse.shortcuts import model_to_dict
 
 class Place(base.BaseModel):
     owner = ForeignKeyField(related_name="places", rel_model=User)
@@ -14,3 +15,7 @@ class Place(base.BaseModel):
     price_by_night = IntegerField(default=0)
     latitude = FloatField()
     longitude = FloatField()
+
+    '''def to_hash(self):
+        query = Place.select(Place.id, Place.created_at, Place.updated_at, Place.).get()
+        return model_to_dict(query)'''
