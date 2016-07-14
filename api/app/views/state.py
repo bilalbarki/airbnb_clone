@@ -22,62 +22,30 @@ def states():
         return jsonify(arr)
     else:
         before_request()
-        stateName = request.form.get('state', type=str)
-        lastName = request.form.get('last_name', type=str)
-        emailAddress = request.form.get('email', type=str)
-        passwordRaw = request.form.get('password', type=str)
-        isAdmin = request.form.get('is_admin', type=str)
-        email_query = User.select().where(User.email == emailAddress)
-        if email_query.exists():
-            out = {'code': 1000, 'msg': 'Email already exists'}
+        stateName = request.form.get('name', type=str)
+        state_query = State.select().where(State.name == stateName)
+        if state_query.exists():
+            out = {'code': 1001, 'msg': 'State already exists'}
             after_request()
             return jsonify(out), 409
-        if isAdmin == "True":
-            user_row = User.create(password="default", first_name=firstName, last_name=lastName, email=emailAddress, is_admin=True)
-        else:
-            user_row = User.create(password="default", first_name=firstName, last_name=lastName, email=emailAddress)
-        user_row.password = user_row.set_password(passwordRaw)
-        user_row.save()
+        user_row = State.create(name=stateName)
         out_json = user_row.to_hash()
         after_request()
         return jsonify(out_json)
 
-@app.route('/users/<int:number>', methods=['GET', 'PUT'])
-def user(number):
+@app.route('/states/<int:number>', methods=['GET', 'DELETE'])
+def state(number):
     if request.method == 'GET':
         before_request()
-        query = User.select().where(User.id == number)
+        query = State.select().where(State.id == number)
         for i in query:
-            arr = {"first_name":i.first_name,"email":i.email,"last_name":i.last_name,"is_admin":i.is_admin, "created at":str(i.created_at), "id":str(i.id), "updated_at": str(i.updated_at)}
+            arr = {"id":i.id,"created_at":i.created_at,"updated_at":i.updated_at,"name":i.name}
         after_request()
         return jsonify(arr)
     else:
         before_request()
-        firstName = request.form.get('first_name', type=str)
-        lastName = request.form.get('last_name', type=str)
-        emailAddress = request.form.get('email', type=str)
-        passwordRaw = request.form.get('password', type=str)
-        isAdmin = request.form.get('is_admin', type=str)
-        email_query = User.select().where(User.email == emailAddress)
-        query = User.select().where(User.id == number).get()
-        if emailAddress != None:
-            if email_query.exists():
-                out = {'code': 1000, 'msg': 'Email already exists'}
-                after_request()
-                return jsonify(out), 409
-            query.email = emailAddress
-        if firstName != None:
-            query.first_name = firstName
-        if lastName != None:
-            query.last_name = lastName
-        if isAdmin != None:
-            if isAdmin == "True":
-                query.is_admin = True
-            elif isAdmin == "False":
-                query.is_admin = False
-        if passwordRaw != None:
-            query.set_password(passwordRaw)
-        query.save()
+        query = State.select().where(State.id == number).get()
         out_json = query.to_hash()
+        query.delete_instance()
         after_request()
         return jsonify(out_json)

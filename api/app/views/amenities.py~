@@ -10,8 +10,8 @@ import json
 
 app.config['JSON_ADD_STATUS'] = False
 
-@app.route('/users', methods=['GET', 'POST'])
-def users():
+@app.route('/places/<place_id>/books', methods=['GET'])
+def books():
     if request.method == 'GET':
         before_request()
         arr = []

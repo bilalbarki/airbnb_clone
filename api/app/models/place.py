@@ -16,6 +16,21 @@ class Place(base.BaseModel):
     latitude = FloatField()
     longitude = FloatField()
 
-    '''def to_hash(self):
-        query = Place.select(Place.id, Place.created_at, Place.updated_at, Place.).get()
-        return model_to_dict(query)'''
+    def to_hash(self):
+        quert = {}
+        city = City.get(City.id == self.city)
+        owner = User.get(User.id == self.owner)
+        
+        query['number_bathrooms'] = self.number_bathrooms
+        query['max_guest'] = self.max_guest
+        query['price_by_night'] = self.price_by_night
+        query['latitude'] = self.latitude
+        query['longitude'] = self.longitude
+        query['owner_id'] = owner.id
+        query['city_id'] = city.id
+        query['name'] = self.name
+        query['description'] = self.description
+        query['number_rooms'] = self.number_rooms
+        query['created_at'] = self.created_at
+        query['updated'] = self.updated_at
+        return query
