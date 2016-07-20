@@ -1,54 +1,44 @@
-from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app import app
 from app.models.base import db
 from app.models.city import City
 from app.models.state import State
-from flask_json import FlaskJSON, as_json
-from index import before_request, after_request
-from playhouse.shortcuts import model_to_dict
-import json
+from flask_json import as_json
 
 app.config['JSON_ADD_STATUS'] = False
 
-@app.route('/states/<int:state_id>/cities', methods=['GET', 'POST'])
-def cities(state_id):
+@app.route('/states/<int:state_id>/cities', methods=['GET'])
+def get_cities(state_id):
     if request.method == 'GET':
-        before_request()
-        arr = []
+        cities = []
         query = (City.select(State, City).join(State).where(State.id == state_id))
-        for i in query:
-            arr.append({"name":i.name, "created at":str(i.created_at), "id":str(i.id), "updated_at": str(i.updated_at), "state": i.state.name})
-        after_request()
-        return jsonify(arr)
-    else:
-        before_request()
-        cityName = request.form.get('name', type=str)
-        city_query = City.select().where(City.name == cityName)
+        for city in query:
+            cities.append(city.to_hash())
+        return jsonify(cities)
+
+@app.route('/states/<int:state_id>/cities', methods=['POST'])
+@as_json
+def create_new_city(state_id):
+    post_data = request.values
+    if 'name' in post_data:
+        city_query = City.select().where(City.name == post_data['name'])
         state_query = State.select().where(State.id == state_id).get()
         if city_query.exists():
             out = {'code': 1002, 'msg': 'City already exists'}
-            after_request()
-            return jsonify(out), 409
-        user_row = City.create(state=state_query, name=cityName)
-        out_json = user_row.to_hash()
-        after_request()
-        return jsonify(out_json)
+            return out, 409
+        city_row = City.create(state=state_query, name=post_data['name'])
+        return city_row.to_hash()
+    else:
+        return {"code":404, "msg":"not found"}
 
 @app.route('/states/<int:state_id>/cities/<int:city_id>', methods=['GET', 'DELETE'])
+@as_json
 def city(state_id, city_id):
     if request.method == 'GET':
-        before_request()
-        i = City.get(City.id == city_id, City.state == state_id)
-        #for i in query:
-        arr = {"name":i.name, "created at":str(i.created_at), "id":str(i.id), "updated_at": str(i.updated_at), "state": i.state.name}
-        after_request()
-        return jsonify(arr)
-    else:
-        before_request()
         query = City.get(City.id == city_id, City.state == state_id)
-        #query = City.select().where(City.id == number).get()
-        out_json = query.to_hash()
+        return query.to_hash()
+    else:
+        query = City.get(City.id == city_id, City.state == state_id)
+        out_dict = query.to_hash()
         query.delete_instance()
-        after_request()
-        return jsonify(out_json)
+        return out_dict

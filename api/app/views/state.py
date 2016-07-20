@@ -1,51 +1,42 @@
-from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 from app import app
 from app.models.base import db
 from app.models.state import State
-from flask_json import FlaskJSON, as_json
-from index import before_request, after_request
-from playhouse.shortcuts import model_to_dict
-import json
+from flask_json import as_json
 
 app.config['JSON_ADD_STATUS'] = False
 
-@app.route('/states', methods=['GET', 'POST'])
-def states():
+@app.route('/states', methods=['GET'])
+def get_states():
     if request.method == 'GET':
-        before_request()
-        arr = []
+        states = []
         query = State.select()
-        for i in query:
-            arr.append({"id":i.id,"created_at":i.created_at,"updated_at":i.updated_at,"name":i.name})
-        after_request()
-        return jsonify(arr)
+        for state in query:
+            states.append(state.to_hash())
+        return jsonify(states)
+
+@app.route('/states', methods=['POST'])
+@as_json
+def create_new_state():
+    post_data = request.values
+    state_query = State.select().where(State.name == post_data['name'])
+    if state_query.exists():
+        out = {'code': 1001, 'msg': 'State already exists'}
+        return out, 409
+    if 'name' in post_data:
+        state_row = State.create(name=post_data['name'])
+        return state_row.to_hash()
     else:
-        before_request()
-        stateName = request.form.get('name', type=str)
-        state_query = State.select().where(State.name == stateName)
-        if state_query.exists():
-            out = {'code': 1001, 'msg': 'State already exists'}
-            after_request()
-            return jsonify(out), 409
-        user_row = State.create(name=stateName)
-        out_json = user_row.to_hash()
-        after_request()
-        return jsonify(out_json)
+        return {'code':404, 'msg':'not found'}
 
 @app.route('/states/<int:number>', methods=['GET', 'DELETE'])
+@as_json
 def state(number):
     if request.method == 'GET':
-        before_request()
-        query = State.select().where(State.id == number)
-        for i in query:
-            arr = {"id":i.id,"created_at":i.created_at,"updated_at":i.updated_at,"name":i.name}
-        after_request()
-        return jsonify(arr)
+        query = State.get(State.id == number)
+        return query.to_hash()
     else:
-        before_request()
         query = State.select().where(State.id == number).get()
         out_json = query.to_hash()
         query.delete_instance()
-        after_request()
-        return jsonify(out_json)
+        return out_json

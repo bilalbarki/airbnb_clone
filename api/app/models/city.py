@@ -8,5 +8,9 @@ class City(base.BaseModel):
     state = ForeignKeyField(related_name="cities", rel_model=State, on_delete='CASCADE')
 
     def to_hash(self):
-        values = {"id":self.id,"created_at":self.created_at,"updated_at":self.updated_at,"name":self.name}
-        return values
+        state = State.get(State.id == self.state)
+        values = {
+            "name":self.name,
+            "state_id":state.id
+        }
+        return super(City, self).to_hash(values)

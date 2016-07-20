@@ -2,7 +2,6 @@ import base
 from peewee import *
 from user import *
 from city import *
-from playhouse.shortcuts import model_to_dict
 
 class Place(base.BaseModel):
     owner = ForeignKeyField(related_name="places", rel_model=User)
@@ -17,20 +16,18 @@ class Place(base.BaseModel):
     longitude = FloatField()
 
     def to_hash(self):
-        quert = {}
         city = City.get(City.id == self.city)
         owner = User.get(User.id == self.owner)
-        
-        query['number_bathrooms'] = self.number_bathrooms
-        query['max_guest'] = self.max_guest
-        query['price_by_night'] = self.price_by_night
-        query['latitude'] = self.latitude
-        query['longitude'] = self.longitude
-        query['owner_id'] = owner.id
-        query['city_id'] = city.id
-        query['name'] = self.name
-        query['description'] = self.description
-        query['number_rooms'] = self.number_rooms
-        query['created_at'] = self.created_at
-        query['updated'] = self.updated_at
-        return query
+        values = {
+            'number_bathrooms': self.number_bathrooms,
+            'max_guest': self.max_guest,
+            'price_by_night': self.price_by_night,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'owner_id': owner.id,
+            'city_id': city.id,
+            'name': self.name,
+            'description': self.description,
+            'number_rooms': self.number_rooms
+        }
+        return super(Place, self).to_hash(values)
