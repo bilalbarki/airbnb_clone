@@ -3,6 +3,7 @@ from app import app
 from app.models.base import db
 from app.models.user import User
 from app.models.amenity import Amenity
+from app.models.place import Place
 from app.models.place_amenity import PlaceAmenities
 from flask_json import as_json
 
@@ -21,11 +22,14 @@ def get_amenities():
 def create_amenity():
     post_data = request.values
     if 'name' in post_data:
-        query = Amenity.select().where(Amenity.name == post_data['name'])
-        if query.exists():
-            out = {'code': 1003, 'msg': 'Amenity already exists'}
+        query_amenity = Amenity.select().where(Amenity.name == post_data['name'])
+        if query_amenity.exists():
+            out = {'code': 1003, 'msg': 'Name already exists'}
             return out, 409
         new_amenity = Amenity.create(name = post_data['name'])
+        if 'place_id' in post_data:
+            query_place = Place.get(Place.id == int(post_data['place_id']))
+            new_place_amenity = PlaceAmenities.create(place=query_place, amenity=new_amenity)
         return new_amenity.to_hash()
     else:
         return {"code":404, "msg": "not found"}, 404
@@ -56,5 +60,5 @@ def get_amenities_by_place(place_id):
     query = PlaceAmenities.select().where(PlaceAmenities.place == place_id)
     for row in query:
         amenity_query = Amenity.get(Amenity.id == row.amenity)
-        amenities.append(amenity_query.to_hash)
-    return jsonify(arr)
+        amenities.append(amenity_query.to_hash())
+    return jsonify(amenities)

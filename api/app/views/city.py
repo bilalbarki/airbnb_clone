@@ -24,12 +24,12 @@ def create_new_city(state_id):
         city_query = City.select().where(City.name == post_data['name'])
         state_query = State.select().where(State.id == state_id).get()
         if city_query.exists():
-            out = {'code': 1002, 'msg': 'City already exists'}
+            out = {'code': 1002, 'msg': 'City already exists in this state'}
             return out, 409
         city_row = City.create(state=state_query, name=post_data['name'])
         return city_row.to_hash()
     else:
-        return {"code":404, "msg":"not found"}
+        return {"code":404, "msg":"not found"}, 404
 
 @app.route('/states/<int:state_id>/cities/<int:city_id>', methods=['GET', 'DELETE'])
 @as_json

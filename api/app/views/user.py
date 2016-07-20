@@ -24,20 +24,23 @@ def create_new_user():
             'msg': 'Email already exists'
         }
         return out, 409
-    user_row = User.create(
-        password="default",
-        first_name=post_data['first_name'],
-        last_name=post_data['last_name'],
-        email=post_data['email']
-    )
-    user_row.password = user_row.set_password(post_data['password'])
-    if 'is_admin' in post_data:
-        if post_data['is_admin'].lower() == "true":
-            user_row.is_admin = True
-        elif post_data['is_admin'].lower() == "false":
-            user_row.is_admin = False
-    user_row.save()
-    return user_row.to_hash()
+    try:
+        user_row = User.create(
+            password = "default",
+            first_name = post_data['first_name'],
+            last_name = post_data['last_name'],
+            email = post_data['email']
+        )
+        user_row.password = user_row.set_password(post_data['password'])
+        if 'is_admin' in post_data:
+            if post_data['is_admin'].lower() == "true":
+                user_row.is_admin = True
+            elif post_data['is_admin'].lower() == "false":
+                user_row.is_admin = False
+        user_row.save()
+        return user_row.to_hash()
+    except:
+        return {"code":404, "msg":"incorrect parameters"}, 404
 
 @app.route('/users/<int:number>', methods=['GET', 'PUT', 'DELETE'])
 @as_json
@@ -69,4 +72,4 @@ def user(number):
             query.delete_instance()
             return out_json
         else:
-            return {"code":404, "msg":"not found"}
+            return {"code":404, "msg":"not found"}, 404

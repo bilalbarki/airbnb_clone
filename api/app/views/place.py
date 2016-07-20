@@ -20,24 +20,25 @@ def get_places():
 @as_json
 def create_new_place():
     post_data = request.values
-    for key in post_data:
-        print key, " ", post_data[key]
-    new_place = Place.create(
-        owner = post_data['owner_id'],
-        name = post_data['name'],
-        city = post_data['city_id'],
-        description = post_data['description'],
-        latitude = post_data['latitude'],
-        longitude = post_data['longitude']
-    )
+    try:
+        new_place = Place.create(
+                owner = int(post_data['owner_id']),
+                name = post_data['name'],
+                city = int(post_data['city_id']),
+                description = post_data['description'],
+                latitude = float(post_data['latitude']),
+                longitude = float(post_data['longitude'])
+        )
+    except:
+        return {"code":404, "msg":"Parameters not correct"}
     if 'number_rooms' in post_data:
-        new_place.number_rooms=post_data['number_rooms']
+        new_place.number_rooms = int(post_data['number_rooms'])
     if 'number_bathrooms' in post_data:
-        new_place.number_bathrooms=post_data['number_bathrooms']
+        new_place.number_bathrooms = int(post_data['number_bathrooms'])
     if 'max_guest' in post_data:
-        new_place.max_guest=post_data['max_guest']
+        new_place.max_guest = int(post_data['max_guest'])
     if 'price_by_night' in post_data:
-        new_place.price_by_night=post_data['price_by_night']
+        new_place.price_by_night = int(post_data['price_by_night'])
     new_place.save()
     return new_place.to_hash()
 
