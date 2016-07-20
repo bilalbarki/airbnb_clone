@@ -27,7 +27,7 @@ def create_new_state():
         state_row = State.create(name=post_data['name'])
         return state_row.to_hash()
     else:
-        return {'code':404, 'msg':'not found'}
+        return {'code':404, 'msg':'not found'}, 404
 
 @app.route('/states/<int:number>', methods=['GET', 'DELETE'])
 @as_json
