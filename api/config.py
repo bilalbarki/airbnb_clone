@@ -21,11 +21,11 @@ if AIRBNB_ENV == environments[0]:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_DEV with your airnbnb_dev password!"
         quit()
 elif AIRBNB_ENV == environments[1]:
-    if password_env == None:
+    if password_prod == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_PROD with your airnbnb_prod password!"
         quit()
 else:
-    if password_env == None:
+    if password_test == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_TEST with your airnbnb_test password!"
         quit()
 
