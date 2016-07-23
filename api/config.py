@@ -61,7 +61,7 @@ else:
     HOST = "localhost"
     PORT = 5555
     DATABASE = {
-        "host": "158.69.79.7",
+        "host": "158.69.78.240",
         "user": "airbnb_user_test",
         "database": database_names[environments[2]],
         "port": 3306,
