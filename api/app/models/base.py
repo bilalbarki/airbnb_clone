@@ -7,7 +7,7 @@ db = MySQLDatabase(
     host=config.DATABASE['host'], 
     port=config.DATABASE['port'], 
     user=config.DATABASE['user'], 
-    password=config.DATABASE['password'],
+    passwd=config.DATABASE['password'],
     database=config.DATABASE['database'], 
     charset=config.DATABASE['charset']
 )
