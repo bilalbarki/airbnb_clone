@@ -59,7 +59,10 @@ def user(number):
         if 'last_name' in post_data:
             query.last_name = post_data['last_name']
         if 'is_admin' in post_data:
-            query.is_admin = post_data['is_admin']
+            if post_data['is_admin'].lower() == "true":
+                query.is_admin = True
+            elif post_data['is_admin'].lower() == "false":
+                query.is_admin = False
         if 'password' in post_data:
             query.set_password(post_data['password'])
         query.save()
