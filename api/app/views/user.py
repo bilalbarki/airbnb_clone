@@ -17,6 +17,10 @@ def users():
 @as_json
 def create_new_user():
     post_data = request.values
+    keys = ["first_name", "last_name", "email", "password"]
+    for key in keys:
+        if key not in post_data:
+            return {"code":400, "msg":"incorrect parameters"}, 400
     email_query = User.select().where(User.email == post_data['email'])
     if email_query.exists():
         out = {
@@ -40,7 +44,7 @@ def create_new_user():
         user_row.save()
         return user_row.to_hash()
     except:
-        return {"code":404, "msg":"incorrect parameters"}, 404
+        return {"code":400, "msg":"incorrect parameters"}, 400
 
 @app.route('/users/<int:number>', methods=['GET', 'PUT', 'DELETE'])
 @as_json
