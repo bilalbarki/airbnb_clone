@@ -24,7 +24,7 @@ def create_new_user():
     email_query = User.select().where(User.email == post_data['email'])
     if email_query.exists():
         out = {
-            'code': 1000, 
+            'code': 10000, 
             'msg': 'Email already exists'
         }
         return out, 409
