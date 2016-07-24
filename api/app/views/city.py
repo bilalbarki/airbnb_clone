@@ -35,10 +35,16 @@ def create_new_city(state_id):
 @as_json
 def city(state_id, city_id):
     if request.method == 'GET':
-        query = City.get(City.id == city_id, City.state == state_id)
+        try:
+            query = City.get(City.id == city_id, City.state == state_id)
+        except:
+            return {"code":404, "msg":"city not found"}, 404
         return query.to_hash()
     else:
-        query = City.get(City.id == city_id, City.state == state_id)
+        try:
+            query = City.get(City.id == city_id, City.state == state_id)
+        except:
+            return {"code":404, "msg":"city not found"}, 404
         out_dict = query.to_hash()
         query.delete_instance()
         return out_dict
