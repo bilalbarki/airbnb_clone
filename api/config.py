@@ -3,6 +3,9 @@ import os
 AIRBNB_ENV = os.environ.get('AIRBNB_ENV')
 environments = ["development", "production", "test"]
 database_names = {environments[0]: "airbnb_dev", environments[1]: "airbnb_prod", environments[2]:"airbnb_test"}
+password_dev = os.environ.get('AIRBNB_DATABASE_PWD_DEV')
+password_prod = os.environ.get('AIRBNB_DATABASE_PWD_PROD')
+password_test = os.environ.get('AIRBNB_DATABASE_PWD_TEST')
 
 # check for errors in the environment variable AIRBNB_ENV
 if AIRBNB_ENV == None:
@@ -11,6 +14,20 @@ if AIRBNB_ENV == None:
 elif AIRBNB_ENV != environments[0] and AIRBNB_ENV != environments[1] and AIRBNB_ENV != environments[2]:
     print "AIRBNB_ENV environment variable has an unsupported value!"
     quit()
+
+
+if AIRBNB_ENV == environments[0]:
+    if password_dev == None:
+        print "Please set the environment variable AIRBNB_DATABASE_PWD_DEV with your airnbnb_dev password!"
+        quit()
+elif AIRBNB_ENV == environments[1]:
+    if password_prod == None:
+        print "Please set the environment variable AIRBNB_DATABASE_PWD_PROD with your airnbnb_prod password!"
+        quit()
+else:
+    if password_test == None:
+        print "Please set the environment variable AIRBNB_DATABASE_PWD_TEST with your airnbnb_test password!"
+        quit()
 
 # set appropriate variables depending on development or production
 if AIRBNB_ENV == environments[0]:
@@ -23,7 +40,7 @@ if AIRBNB_ENV == environments[0]:
         "database": database_names[environments[0]],
         "port": 3306,
         "charset": "utf8",
-        "password": os.environ.get('AIRBNB_DATABASE_PWD_DEV'),
+        "password": password_dev,
     }
 
 elif AIRBNB_ENV == environments[1]:
@@ -36,7 +53,7 @@ elif AIRBNB_ENV == environments[1]:
         "database": database_names[environments[1]],
         "port": 3306,
         "charset": "utf8",
-        "password": os.environ.get('AIRBNB_DATABASE_PWD_PROD'),
+        "password": password_prod,
     }
 
 else:
@@ -44,10 +61,10 @@ else:
     HOST = "localhost"
     PORT = 5555
     DATABASE = {
-        "host": "158.69.79.7",
+        "host": "158.69.78.240",
         "user": "airbnb_user_test",
         "database": database_names[environments[2]],
         "port": 3306,
         "charset": "utf8",
-        "password": os.environ.get('AIRBNB_DATABASE_PWD_TEST'),
+        "password": password_test,
     }

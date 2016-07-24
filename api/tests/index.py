@@ -10,8 +10,8 @@ class TestCase(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-        def tearDown(self):
-            pass 
+    def tearDown(self):
+        pass 
 
     # check HTTP response code for sending GET request to '/'
     def test_200(self):
