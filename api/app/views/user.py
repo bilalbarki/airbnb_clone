@@ -17,10 +17,14 @@ def users():
 @as_json
 def create_new_user():
     post_data = request.values
+    keys = ["first_name", "last_name", "email", "password"]
+    for key in keys:
+        if key not in post_data:
+            return {"code":400, "msg":"incorrect parameters"}, 400
     email_query = User.select().where(User.email == post_data['email'])
     if email_query.exists():
         out = {
-            'code': 1000, 
+            'code': 10000, 
             'msg': 'Email already exists'
         }
         return out, 409
@@ -40,7 +44,7 @@ def create_new_user():
         user_row.save()
         return user_row.to_hash()
     except:
-        return {"code":404, "msg":"incorrect parameters"}, 404
+        return {"code":400, "msg":"incorrect parameters"}, 400
 
 @app.route('/users/<int:number>', methods=['GET', 'PUT', 'DELETE'])
 @as_json
@@ -53,13 +57,19 @@ def user(number):
             return {'error':'user does not exist'}
     elif request.method == 'PUT':
         post_data = request.values
-        query = User.get(User.id == number)
+        try:
+            query = User.get(User.id == number)
+        except:
+            return {'error':'user does not exist'}
         if 'first_name' in post_data:
             query.first_name = post_data['first_name']
         if 'last_name' in post_data:
             query.last_name = post_data['last_name']
         if 'is_admin' in post_data:
-            query.is_admin = post_data['is_admin']
+            if post_data['is_admin'].lower() == "true":
+                query.is_admin = True
+            elif post_data['is_admin'].lower() == "false":
+                query.is_admin = False
         if 'password' in post_data:
             query.set_password(post_data['password'])
         query.save()

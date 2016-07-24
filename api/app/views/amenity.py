@@ -24,7 +24,7 @@ def create_amenity():
     if 'name' in post_data:
         query_amenity = Amenity.select().where(Amenity.name == post_data['name'])
         if query_amenity.exists():
-            out = {'code': 1003, 'msg': 'Name already exists'}
+            out = {'code': 10003, 'msg': 'Name already exists'}
             return out, 409
         new_amenity = Amenity.create(name = post_data['name'])
         if 'place_id' in post_data:
