@@ -53,7 +53,10 @@ def user(number):
             return {'error':'user does not exist'}
     elif request.method == 'PUT':
         post_data = request.values
-        query = User.get(User.id == number)
+        try:
+            query = User.get(User.id == number)
+        except:
+            return {'error':'user does not exist'}
         if 'first_name' in post_data:
             query.first_name = post_data['first_name']
         if 'last_name' in post_data:
