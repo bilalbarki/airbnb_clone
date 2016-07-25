@@ -143,7 +143,6 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(parsed_json['first_name'], 'Jon')
         self.assertEqual(parsed_json['last_name'], 'Snow')
         self.assertEqual(parsed_json['email'], 'jon@snow.com')
-        print response.data
 
         response = self.app.put('/users/1', data=dict(
             first_name='Kate',
@@ -158,4 +157,3 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(parsed_json['first_name'], 'Kate')
         self.assertEqual(parsed_json['last_name'], 'Fire')
         self.assertEqual(parsed_json['email'], 'kate@fire.com')
-        print response.data
