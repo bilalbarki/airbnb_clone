@@ -43,7 +43,7 @@ def book_place(place_id):
 @as_json
 def get_books(place_id, book_id):
     try:
-        get_booking = PlaceBook.get(PlaceBook.id == book_id)
+        get_booking = PlaceBook.get(PlaceBook.id == book_id, PlaceBook.place == place_id)
         return get_booking.to_hash()
     except:
         return {"code":404, "msg":"not found"}, 404

@@ -2,7 +2,7 @@ import os
 
 AIRBNB_ENV = os.environ.get('AIRBNB_ENV')
 environments = ["development", "production", "test"]
-database_names = {environments[0]: "airbnb_dev", environments[1]: "airbnb_prod", environments[2]:"airbnb_test"}
+database_names = {environments[0]: "airbnb_dev", environments[1]: "airbnb_prod", environments[2]: "airbnb_test"}
 password_dev = os.environ.get('AIRBNB_DATABASE_PWD_DEV')
 password_prod = os.environ.get('AIRBNB_DATABASE_PWD_PROD')
 password_test = os.environ.get('AIRBNB_DATABASE_PWD_TEST')
@@ -15,11 +15,13 @@ elif AIRBNB_ENV != environments[0] and AIRBNB_ENV != environments[1] and AIRBNB_
     print "AIRBNB_ENV environment variable has an unsupported value!"
     quit()
 
+#check if password was set properly in the respective envionment variable
 
 if AIRBNB_ENV == environments[0]:
     if password_dev == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_DEV with your airnbnb_dev password!"
         quit()
+
 elif AIRBNB_ENV == environments[1]:
     if password_prod == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_PROD with your airnbnb_prod password!"
@@ -54,6 +56,7 @@ elif AIRBNB_ENV == environments[1]:
         "port": 3306,
         "charset": "utf8",
         "password": password_prod,
+
     }
 
 else:
@@ -67,4 +70,5 @@ else:
         "port": 3306,
         "charset": "utf8",
         "password": password_test,
+
     }

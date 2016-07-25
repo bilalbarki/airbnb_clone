@@ -31,6 +31,20 @@ def create_amenity():
             query_place = Place.get(Place.id == int(post_data['place_id']))
             new_place_amenity = PlaceAmenities.create(place=query_place, amenity=new_amenity)
         return new_amenity.to_hash()
+    elif 'place_id' in post_data and 'amenity_id' in post_data:
+        try:
+            amenity_get = Amenity.select().where(Amenity.id == int(post_data['amenity_id'])).get()
+        except:
+            return {'code': 10004, 'msg': 'Amenity id does not exist'}
+        try:
+            query_place = Place.get(Place.id == int(post_data['place_id']))
+        except:
+            return {'code': 10005, 'msg': 'Place id does not exist'}
+        try:
+            new_place_amenity = PlaceAmenities.create(place=query_place, amenity=amenity_get)
+        except:
+            return {'code': 477, 'msg': 'Database connection error'}
+        return amenity_get.to_hash()
     else:
         return {"code":404, "msg": "not found"}, 404
 
