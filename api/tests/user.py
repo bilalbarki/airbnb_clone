@@ -23,40 +23,53 @@ class UserTestCase(unittest.TestCase):
 
     # create function to send post request to /users
     def create(self, first_name, last_name, email, password):
-        return self.app.post('/users', data=dict(first_name=first_name, last_name=last_name, email=email, password=password))
+        return self.app.post('/users', data=dict(
+            first_name=first_name, 
+            last_name=last_name, 
+            email=email, 
+            password=password))
 
     # test cases for data that might get sent for creating a User
     def test_create(self):
+
         response = self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        #print response.data
-        #assert '"id": 1,' in response.data
-        new_user = User.get(User.id == 1)
-        self.assertEqual(new_user.first_name, 'Jon');
-        self.assertEqual(new_user.last_name, 'Snow');
-        self.assertEqual(new_user.email, 'jon@snow.com');
-        assert new_user.password is not None
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['id'], 1) # assert parsed_json['id'] == 1
 
-        # test cases of missing parameters, should raise error:
-        #with self.assertRaises(TypeError):
-        response = self.create('Jon', 'Snow', 'jon@snow.com')
-        with self.assertRaises(TypeError):
-            response = self.create('Jon', 'Snow', 'toto1234')
-        with self.assertRaises(TypeError):
-            response = self.create('Jon', 'jon@snow.com', 'toto1234')
-        with self.assertRaises(TypeError):
-            response = self.create('Snow', 'jon@snow.com', 'toto1234')
+        # test cases of missing parameters, should return 400 error code
+        ''' note: we would also check json msg and error code, but project 
+            does not specify what these should be '''
+        response = self.app.post('/users', data=dict(
+            first_name='Kate', 
+            last_name='Snow', 
+            email='kate1@snow.com'
+        ))
+        self.assertEqual(response.status_code, 400)        
 
+        response = self.app.post('/users', data=dict(
+            first_name='Kate', 
+            last_name='Snow', 
+            password='abcd1234'
+        ))
+        self.assertEqual(response.status_code, 400)        
+
+        response = self.app.post('/users', data=dict(
+            first_name='Kate', 
+            email='kate3@snow.com', 
+            password='abcd1234'
+        ))
+        self.assertEqual(response.status_code, 400)        
+
+        response = self.app.post('/users', data=dict(
+            last_name='Snow', 
+            email='kate4@snow.com', 
+            password='abcd1234'
+        ))
+        self.assertEqual(response.status_code, 400)        
+
+        # test proper response is generated for duplicate email
         response = self.create('Kate', 'Snow', 'jon@snow.com', 'abcd1234')
-        #print response.data
-        #with self.assertRaises(UserDoesNotExist):
-        #    new_user = User.get(User.id == 2)
         self.assertEquals(response.status_code, 409)
         json_response = json.loads(response.data)
         self.assertEqual(json_response['code'], 10000)
-        self.assertEqual(json_response['msg'], "Email already exists")
-        
-
-        #response = self.create('Jon', 'Snow', 'jon@snow.com')
-        #response = self.create('Jon', 'Snow', 'toto1234')
-        #response = self.create('Jon', 'jon@snow.com', 'toto1234')
-        #response = self.create('Snow', 'jon@snow.com', 'toto1234')
+        self.assertEqual(json_response['msg'], "Email already exists")      
