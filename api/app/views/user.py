@@ -54,7 +54,7 @@ def user(number):
             query = User.get(User.id == number)
             return query.to_hash()
         except:
-            return {'error':'user does not exist'}
+            return {'error':'user does not exist'}, 404
     elif request.method == 'PUT':
         post_data = request.values
         try:
