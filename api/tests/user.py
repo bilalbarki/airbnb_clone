@@ -92,19 +92,70 @@ class UserTestCase(unittest.TestCase):
         created_at = datetime.now().strftime("%Y/%m/%d %H:%M")
         self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
         response = self.app.get('/users/1')
+        
         # check status code is 200:
         self.assertEqual(response.status_code, 200)
+        
         # check data and time created is the same:
         parsed_json = json.loads(response.data)
         self.assertEqual(parsed_json['first_name'], 'Jon')
         self.assertEqual(parsed_json['last_name'], 'Snow')
         self.assertEqual(parsed_json['email'], 'jon@snow.com')
         self.assertEqual(parsed_json['created_at'][:-3], created_at)
+        
         # check appropriate response when trying to get unknown user:
         response = self.app.get('/users/99')
-        print response.data
         self.assertEqual(response.status_code, 404)
         parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['code'], '404')
+        self.assertEqual(parsed_json['code'], 404)
         self.assertEqual(parsed_json['msg'], 'not found')
 
+    # validate DELETE request on user ID at /users/<user_id>:
+    def test_delete(self):
+        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
+        
+        # number of User elements returned by GET req should be 1 now
+        response = self.app.get('/users')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(len(parsed_json), 1)
+        
+        # check the status code of deleting an element
+        response = self.app.delete('/users/1')
+        self.assertEqual(response.status_code, 200)
+        
+        # number of User elements returned by GET req should be 0 now
+        response = self.app.get('/users')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(len(parsed_json), 0)
+
+        # check appropriate response when trying to get unknown user:
+        response = self.app.delete('/users/99')
+        self.assertEqual(response.status_code, 404)
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['code'], 404)
+        self.assertEqual(parsed_json['msg'], 'not found')
+
+    # validate PUT request to update record at /users/<user_id>:
+    def test_update(self):
+        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
+        response = self.app.get('/users/1')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['first_name'], 'Jon')
+        self.assertEqual(parsed_json['last_name'], 'Snow')
+        self.assertEqual(parsed_json['email'], 'jon@snow.com')
+        print response.data
+
+        response = self.app.put('/users/1', data=dict(
+            first_name='Kate',
+            last_name='Fire',
+            email='kate@fire.com',
+            password='abcd1234'
+        ))
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.app.get('/users/1')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['first_name'], 'Kate')
+        self.assertEqual(parsed_json['last_name'], 'Fire')
+        self.assertEqual(parsed_json['email'], 'kate@fire.com')
+        print response.data
