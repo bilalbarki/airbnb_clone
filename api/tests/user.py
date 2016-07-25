@@ -73,3 +73,17 @@ class UserTestCase(unittest.TestCase):
         json_response = json.loads(response.data)
         self.assertEqual(json_response['code'], 10000)
         self.assertEqual(json_response['msg'], "Email already exists")      
+
+    # test list of Users is correctly returned after GET request:
+    def test_list(self):
+        # should return 0 elements if no user was created
+        response = self.app.get('/users')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(len(parsed_json), 0)
+        
+        # should return 1 element after a user is created
+        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
+        response = self.app.get('/users')
+        parsed_json = json.loads(response.data)
+        self.assertEqual(len(parsed_json), 1)
+        
