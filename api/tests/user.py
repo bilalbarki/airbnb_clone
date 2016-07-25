@@ -74,7 +74,7 @@ class UserTestCase(unittest.TestCase):
         self.assertEqual(json_response['code'], 10000)
         self.assertEqual(json_response['msg'], "Email already exists")      
 
-    # test list of Users is correctly returned after GET request:
+    # test list of Users is returned to a GET request with appropriate # elements:
     def test_list(self):
         # should return 0 elements if no user was created
         response = self.app.get('/users')
@@ -86,4 +86,25 @@ class UserTestCase(unittest.TestCase):
         response = self.app.get('/users')
         parsed_json = json.loads(response.data)
         self.assertEqual(len(parsed_json), 1)
-        
+
+    # test retrieving a specific User at route /users/<user_id>:
+    def test_get(self):
+        created_at = datetime.now().strftime("%Y/%m/%d %H:%M")
+        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
+        response = self.app.get('/users/1')
+        # check status code is 200:
+        self.assertEqual(response.status_code, 200)
+        # check data and time created is the same:
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['first_name'], 'Jon')
+        self.assertEqual(parsed_json['last_name'], 'Snow')
+        self.assertEqual(parsed_json['email'], 'jon@snow.com')
+        self.assertEqual(parsed_json['created_at'][:-3], created_at)
+        # check appropriate response when trying to get unknown user:
+        response = self.app.get('/users/99')
+        print response.data
+        self.assertEqual(response.status_code, 404)
+        parsed_json = json.loads(response.data)
+        self.assertEqual(parsed_json['code'], '404')
+        self.assertEqual(parsed_json['msg'], 'not found')
+
