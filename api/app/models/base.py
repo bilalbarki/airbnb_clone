@@ -3,12 +3,13 @@ from datetime import datetime
 import config
 
 # Connect to the MySQL database, either production or development, depending on the configuration
-db = MySQLDatabase(config.DATABASE['database'], 
-    user=config.DATABASE['user'], 
-    charset=config.DATABASE['charset'],
+db = MySQLDatabase(
     host=config.DATABASE['host'], 
     port=config.DATABASE['port'], 
-    passwd=config.DATABASE['password']
+    user=config.DATABASE['user'], 
+    password=config.DATABASE['password'],
+    database=config.DATABASE['database'], 
+    charset=config.DATABASE['charset']
 )
 
 class BaseModel(Model):

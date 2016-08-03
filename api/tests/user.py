@@ -1,159 +1,165 @@
 from app import app
+from datetime import datetime
+import unittest, json, logging, itertools
 from app.models.base import db
 from app.models.user import User
-from datetime import datetime
-import json
-import unittest
-import logging
-import peewee
 
 class UserTestCase(unittest.TestCase):
+	def setUp(self):
+		self.app = app.test_client()
+		logging.disable(logging.CRITICAL)
+		db.create_tables([User], safe = True)
 
-    # create a test client of app
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
-        logging.disable(logging.CRITICAL)
+	def tearDown(self):
+		db.drop_table(User)
 
-        db.connect()
-        db.create_tables([User])
+	def user_dict(self, first_name = None, last_name = None, email = None, password = None, is_admin = None):
+		values = {}
+		if first_name != None:
+			values['first_name'] = first_name
+		if last_name != None:
+			values['last_name'] = last_name
+		if email != None:
+			values['email'] = email
+		if is_admin != None:
+			values['is_admin'] = is_admin
+		if password != None:
+			values['password'] = password
+		return values
 
-    def tearDown(self):
-        db.drop_table(User) 
+	def create_user(self, user_dict):
+		return self.app.post('/users', data=user_dict)
 
-    # create function to send post request to /users
-    def create(self, first_name, last_name, email, password):
-        return self.app.post('/users', data=dict(
-            first_name=first_name, 
-            last_name=last_name, 
-            email=email, 
-            password=password))
+	def test_create(self):
+   		true_cases = [
+   			["Jon", "Snow", "jon@snow.com", "toto1234", True],
+   			["Arya", "Stark", "arya@stark.com", "1122334a"]
+   		]
 
-    # test cases for data that might get sent for creating a User
-    def test_create(self):
+   		false_cases = [
+   			[['Jon',], ['Snow',], ['jon@snow.com',], ['toto1234',], [True,]],
+			[['Jon', 'Snow'], ['Jon', 'jon@snow.com'], ['Jon', 'toto1234'], ['Jon', True], ['Snow', 'jon@snow.com'], ['Snow', 'toto1234'], ['Snow', True], ['jon@snow.com', 'toto1234'], ['jon@snow.com', True], ['toto1234', True]],
+			[['Jon', 'Snow', 'jon@snow.com'], ['Jon', 'Snow', 'toto1234'], ['Jon', 'Snow', True], ['Jon', 'jon@snow.com', 'toto1234'], ['Jon', 'jon@snow.com', True], ['Jon', 'toto1234', True], ['Snow', 'jon@snow.com', 'toto1234'], ['Snow', 'jon@snow.com', True], ['Snow', 'toto1234', True], ['jon@snow.com', 'toto1234', True]],
+			[['Jon', 'Snow', 'jon@snow.com', True], ['Jon', 'Snow', 'toto1234', True], ['Jon', 'jon@snow.com', 'toto1234', True], ['Snow', 'jon@snow.com', 'toto1234', True]],
+		]
 
-        response = self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['id'], 1) # assert parsed_json['id'] == 1
+		duplicate_email_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		id_count = 1
+		for data_set in true_cases:
+			user_dictionary = self.user_dict(*data_set)
+			resp = self.create_user(user_dictionary)
+			jsonified = json.loads(resp.data)
+			self.assertEqual(jsonified['id'], id_count)
+			if len(data_set) == 4:
+				self.assertEqual(jsonified['is_admin'], False)
+			id_count+=1
 
-        # test cases of missing parameters, should return 400 error code
-        ''' note: we would also check json msg and error code, but project 
-            does not specify what these should be '''
-        response = self.app.post('/users', data=dict(
-            first_name='Kate', 
-            last_name='Snow', 
-            email='kate1@snow.com'
-        ))
-        self.assertEqual(response.status_code, 400)        
+		user_dictionary = self.user_dict(*duplicate_email_case)
+		resp = self.create_user(user_dictionary)
+		jsonified = json.loads(resp.data)
+		self.assertEqual(jsonified['code'], 10000)
+		# might need to check error status
+		'''for data_set in false_cases:
+			key = False
+			user_dictionary = self.user_dict(*data_set)
+			resp = self.create_user(user_dictionary)
+			jsonified = json.loads(resp.data)
+			self.assertEqual(jsonified['id'], id_count)
+			id_count+=1'''
 
-        response = self.app.post('/users', data=dict(
-            first_name='Kate', 
-            last_name='Snow', 
-            password='abcd1234'
-        ))
-        self.assertEqual(response.status_code, 400)        
+	def test_list(self):
+		resp = self.app.get('/users')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 0)
+			
+		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		user_dictionary = self.user_dict(*true_case)
+		resp = self.create_user(user_dictionary)
+		#jsonified = json.loads(resp.data)
+		#self.assertEqual(len(jsonified), 7)
+		
+		resp = self.app.get('/users')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 1)
 
-        response = self.app.post('/users', data=dict(
-            first_name='Kate', 
-            email='kate3@snow.com', 
-            password='abcd1234'
-        ))
-        self.assertEqual(response.status_code, 400)        
+	def test_get(self):
+		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		set_keys_user = ["first_name", "last_name", "email", "is_admin"]
+		set_keys_base = ["created_at", "updated_at", "id"]
+		user_dictionary = self.user_dict(*true_case)
+		self.create_user(user_dictionary)
+		resp = self.app.get('/users/1')
+		self.assertEqual(resp.status_code, 200)
+		jsonified = json.loads(resp.data)
+		self.assertEqual(set(jsonified), set(set_keys_user + set_keys_base))
+		true_case.remove("toto1234")
+		for key, value in zip(set_keys_user, true_case):
+			self.assertEqual(jsonified[key], value)
 
-        response = self.app.post('/users', data=dict(
-            last_name='Snow', 
-            email='kate4@snow.com', 
-            password='abcd1234'
-        ))
-        self.assertEqual(response.status_code, 400)        
+		# check for non-existing user
+		resp = self.app.get('/users/100')
+		jsonified = json.loads(resp.data)
+		self.assertFalse("id" in jsonified.keys())
 
-        # test proper response is generated for duplicate email
-        response = self.create('Kate', 'Snow', 'jon@snow.com', 'abcd1234')
-        self.assertEquals(response.status_code, 409)
-        json_response = json.loads(response.data)
-        self.assertEqual(json_response['code'], 10000)
-        self.assertEqual(json_response['msg'], "Email already exists")      
+	def test_delete(self):
+		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		user_dictionary = self.user_dict(*true_case)
+		self.create_user(user_dictionary)
+		resp_before_del = self.app.get('/users')
+		jsonified_before_del = json.loads(resp_before_del.data)
+		resp = self.app.delete('/users/1')
+		self.assertEqual(resp.status_code, 200)
+		resp_after_del = self.app.get('/users')
+		jsonified_after_del = json.loads(resp_after_del.data)
+		self.assertEqual(len(jsonified_before_del), 1)
+		self.assertEqual(len(jsonified_after_del), 0)
 
-    # test list of Users is returned to a GET request with appropriate # elements:
-    def test_list(self):
-        # should return 0 elements if no user was created
-        response = self.app.get('/users')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(len(parsed_json), 0)
-        
-        # should return 1 element after a user is created
-        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        response = self.app.get('/users')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(len(parsed_json), 1)
+		# testing non-existent delete
+		resp = self.app.delete('/users/100')
+		jsonified = json.loads(resp.data)
+		self.assertFalse("id" in jsonified.keys())
 
-    # test retrieving a specific User at route /users/<user_id>:
-    def test_get(self):
-        created_at = datetime.now().strftime("%Y/%m/%d %H:%M")
-        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        response = self.app.get('/users/1')
-        
-        # check status code is 200:
-        self.assertEqual(response.status_code, 200)
-        
-        # check data and time created is the same:
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['first_name'], 'Jon')
-        self.assertEqual(parsed_json['last_name'], 'Snow')
-        self.assertEqual(parsed_json['email'], 'jon@snow.com')
-        self.assertEqual(parsed_json['created_at'][:-3], created_at)
-        
-        # check appropriate response when trying to get unknown user:
-        response = self.app.get('/users/99')
-        self.assertEqual(response.status_code, 404)
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['code'], 404)
-        self.assertEqual(parsed_json['msg'], 'not found')
+	def test_update(self):
+		#def update_user(id, update_dict):
+		#	return self.app.put('/users/%d' % id, data=update_dict)
 
-    # validate DELETE request on user ID at /users/<user_id>:
-    def test_delete(self):
-        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        
-        # number of User elements returned by GET req should be 1 now
-        response = self.app.get('/users')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(len(parsed_json), 1)
-        
-        # check the status code of deleting an element
-        response = self.app.delete('/users/1')
-        self.assertEqual(response.status_code, 200)
-        
-        # number of User elements returned by GET req should be 0 now
-        response = self.app.get('/users')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(len(parsed_json), 0)
+		def update_user(id, update_dict):
+			resp = self.app.put('/users/%d' % id, data=update_dict)
+			jsonified = json.loads(resp.data)
+			return jsonified, resp.status_code
+		
+		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		user_dictionary = self.user_dict(*true_case)
+		self.create_user(user_dictionary)
+		update_values = [
+			["Arya"], [None, "Stark"], [None, None, "arya@stark.com"], [None, None, None, "newpassword"], [None, None, None, None, False],
+			#["Cercei", "Lynnister"],
+			#["Sansa", "S.", "sansa@stark.com"],
+			#["Neo", "Anderson", "neo@matrix.com", "onepassword"],
+			#["James", "Cole", "james@cole.com", "12password", True],
+		]
+		set_keys_user = ["first_name", "last_name", "email", "password", "is_admin"]
+		for update_list,key in zip(update_values, set_keys_user):
+			update_dict = self.user_dict(*update_list)
+			jsonified, status = update_user(1, update_dict)
+			if key == "email":
+				self.assertEqual(jsonified[key], user_dictionary[key])
+			elif key == "password":
+				self.assertEqual(status, 200)
+			else:
+				self.assertEqual(jsonified[key], update_dict[key])
 
-        # check appropriate response when trying to get unknown user:
-        response = self.app.delete('/users/99')
-        self.assertEqual(response.status_code, 404)
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['code'], 404)
-        self.assertEqual(parsed_json['msg'], 'not found')
+		packaged_update_values = ["James", "Cole", "james@cole.com", "12password", True]
+		update_dict = self.user_dict(*packaged_update_values)
+		jsonified, status = update_user(1, update_dict)
+		for key in set_keys_user:
+			if key == "email":
+				self.assertEqual(jsonified[key], user_dictionary[key])
+			elif key == "password":
+				self.assertEqual(status, 200)
+			else:
+				self.assertEqual(jsonified[key], update_dict[key])
 
-    # validate PUT request to update record at /users/<user_id>:
-    def test_update(self):
-        self.create('Jon', 'Snow', 'jon@snow.com', 'toto1234')
-        response = self.app.get('/users/1')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['first_name'], 'Jon')
-        self.assertEqual(parsed_json['last_name'], 'Snow')
-        self.assertEqual(parsed_json['email'], 'jon@snow.com')
-
-        response = self.app.put('/users/1', data=dict(
-            first_name='Kate',
-            last_name='Fire',
-            email='kate@fire.com',
-            password='abcd1234'
-        ))
-        self.assertEqual(response.status_code, 200)
-        
-        response = self.app.get('/users/1')
-        parsed_json = json.loads(response.data)
-        self.assertEqual(parsed_json['first_name'], 'Kate')
-        self.assertEqual(parsed_json['last_name'], 'Fire')
-        self.assertEqual(parsed_json['email'], 'kate@fire.com')
+		# testing non-existent put request
+		jsonified, status = update_user(100, update_dict)
+		self.assertFalse("id" in jsonified.keys())

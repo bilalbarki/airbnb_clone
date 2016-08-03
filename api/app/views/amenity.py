@@ -31,20 +31,20 @@ def create_amenity():
             query_place = Place.get(Place.id == int(post_data['place_id']))
             new_place_amenity = PlaceAmenities.create(place=query_place, amenity=new_amenity)
         return new_amenity.to_hash()
-    elif 'place_id' in post_data and 'amenity_id' in post_data:
-        try:
-            amenity_get = Amenity.select().where(Amenity.id == int(post_data['amenity_id'])).get()
-        except:
-            return {'code': 10004, 'msg': 'Amenity id does not exist'}
-        try:
-            query_place = Place.get(Place.id == int(post_data['place_id']))
-        except:
-            return {'code': 10005, 'msg': 'Place id does not exist'}
-        try:
-            new_place_amenity = PlaceAmenities.create(place=query_place, amenity=amenity_get)
-        except:
-            return {'code': 477, 'msg': 'Database connection error'}
-        return amenity_get.to_hash()
+    # elif 'place_id' in post_data and 'amenity_id' in post_data:
+    #     try:
+    #         amenity_get = Amenity.select().where(Amenity.id == int(post_data['amenity_id'])).get()
+    #     except:
+    #         return {'code': 10004, 'msg': 'Amenity id does not exist'}
+    #     try:
+    #         query_place = Place.get(Place.id == int(post_data['place_id']))
+    #     except:
+    #         return {'code': 10005, 'msg': 'Place id does not exist'}
+    #     try:
+    #         new_place_amenity = PlaceAmenities.create(place=query_place, amenity=amenity_get)
+    #     except:
+    #         return {'code': 477, 'msg': 'Database connection error'}
+    #     return amenity_get.to_hash()
     else:
         return {"code":404, "msg": "not found"}, 404
 
@@ -76,3 +76,39 @@ def get_amenities_by_place(place_id):
         amenity_query = Amenity.get(Amenity.id == row.amenity)
         amenities.append(amenity_query.to_hash())
     return jsonify(amenities)
+
+@app.route('/places/<int:place_id>/amenities/<int:amenity_id>', methods=['POST'])
+@as_json
+def create_amenityPlace(place_id, amenity_id):
+    try:
+        amenity_get = Amenity.select().where(Amenity.id == amenity_id).get()
+    except:
+        return {'code': 10004, 'msg': 'Amenity id does not exist'}, 404
+    try:
+        query_place = Place.get(Place.id == place_id)
+    except:
+        return {'code': 10005, 'msg': 'Place id does not exist'}, 404
+    try:
+        new_place_amenity = PlaceAmenities.create(place=query_place, amenity=amenity_get)
+    except:
+        return {'code': 477, 'msg': 'Database connection error'}
+    return amenity_get.to_hash()
+
+@app.route('/places/<int:place_id>/amenities/<int:amenity_id>', methods=['DELETE'])
+@as_json
+def delete_amenityPlace(place_id, amenity_id):
+    try:
+        amenity_get = Amenity.select().where(Amenity.id == amenity_id).get()
+    except:
+        return {'code': 10004, 'msg': 'Amenity id does not exist'}, 404
+    try:
+        query_place = Place.get(Place.id == place_id)
+    except:
+        return {'code': 10005, 'msg': 'Place id does not exist'}, 404
+    try:
+        new_place_amenity = PlaceAmenities.get(PlaceAmenities.place==query_place, PlaceAmenities.amenity==amenity_get)
+    except:
+        return {'code': 477, 'msg': 'Database connection error'}
+    out_dict = amenity_get.to_hash()
+    new_place_amenity.delete_instance()
+    return out_dict

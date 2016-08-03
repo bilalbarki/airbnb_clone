@@ -1,34 +1,30 @@
 from app import app
 from datetime import datetime
-import json
-import unittest
+import unittest, json
 
-class TestCase(unittest.TestCase):
+class IndexTestCase(unittest.TestCase):
+	def setUp(self):
+		self.app = app.test_client()
 
-    # create a test client of app
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+	def test_200(self):
+		resp = self.app.get('/')
+		self.assertEquals(resp.status_code, 200)
 
-    def tearDown(self):
-        pass 
+	def test_status(self):
+		resp = self.app.get('/')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(jsonified['status'], "OK")
 
-    # check HTTP response code for sending GET request to '/'
-    def test_200(self):
-        response = self.app.get('/')
-        self.assertEquals(response.status_code, 200)
+	def test_time(self):
+		resp = self.app.get('/')
+		datetimenow = datetime.now().strftime("%Y/%m/%d %H:%M")
+		jsonified = json.loads(resp.data)
+		resp_time = jsonified['time'][:-3]
+		self.assertEqual(resp_time, datetimenow)
 
-    # check if the status is OK in the json response
-    def test_status(self):
-        response = self.app.get('/')
-        assert '"status": "OK"' in response.data
-
-    # check if the 'time' key in json response matches now-time
-    def test_time(self):
-        response = self.app.get('/')
-        assert '"time": "%s' % datetime.now().strftime("%Y/%m/%d %H:%M") in response.data
-
-    # check if the 'utc_time' key in json response matches now-time
-    def test_time_utc(self):
-        response = self.app.get('/')
-        assert '"utc_time": "%s' % datetime.utcnow().strftime("%Y/%m/%d %H:%M") in response.data
+	def test_time_utc(self):
+		resp = self.app.get('/')
+		utcdatetimenow = datetime.utcnow().strftime("%Y/%m/%d %H:%M")
+		jsonified = json.loads(resp.data)
+		resp_time = jsonified['utc_time'][:-3]
+		self.assertEqual(resp_time, utcdatetimenow)

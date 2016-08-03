@@ -196,13 +196,13 @@ class AmenitiesTestCase(unittest.TestCase):
 		jsonified = json.loads(resp.data)
 		self.assertEqual(len(jsonified), 0)
 		
-		cases = [None, 1, 1]
-		amenity_dictionary = self.name_dict(*cases)
-		jsonified, status = self.create_amenity_and_return_json(amenity_dictionary)
+		# cases = [None, 1, 1]
+		# amenity_dictionary = self.name_dict(*cases)
+		# jsonified, status = self.create_amenity_and_return_json(amenity_dictionary)
 
-		resp = get_amenities(1)
-		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)	
+		# resp = get_amenities(1)
+		# jsonified = json.loads(resp.data)
+		# self.assertEqual(len(jsonified), 1)	
 
 
 

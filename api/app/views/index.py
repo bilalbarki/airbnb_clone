@@ -23,7 +23,7 @@ def after_request():
 @app.errorhandler(404)
 @as_json
 def not_found(error=None):
-    return dict(code="404", msg="not found"), 404
+    return dict(code=404, msg="not found"), 404
 
 
 '''@app.errorhandler(404)

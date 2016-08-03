@@ -134,3 +134,11 @@ def create_place_by_city(state_id, city_id):
         new_place.price_by_night=int(post_data['price_by_night'])
     new_place.save()
     return new_place.to_hash()
+
+@app.route('/states/<int:state_id>/places', methods=['GET'])
+def places_by_state(state_id):
+    place_query = Place.select().join(City).where(City.state_id == state_id)
+    places = []
+    for place in place_query:
+        places.append(place.to_hash())
+    return jsonify(places)
