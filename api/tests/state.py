@@ -70,7 +70,7 @@ class StateTestCase(unittest.TestCase):
 		#self.assertEqual(jsonified['updated_at'][:-3], time_now)
 
 		# check for non-existing state
-		resp = self.app.get('/users/100')
+		resp = self.app.get('/states/100')
 		jsonified = json.loads(resp.data)
 		self.assertFalse("id" in jsonified.keys())
 

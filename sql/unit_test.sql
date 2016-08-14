@@ -9,3 +9,5 @@ CREATE DATABASE airbnb_test
 # grant respective privileges
 # airbnb_user_test has all permissions to airbnb_test
 GRANT ALL PRIVILEGES ON airbnb_test.* TO 'airbnb_user_test'@'%';
+
+FLUSH PRIVILEGES;

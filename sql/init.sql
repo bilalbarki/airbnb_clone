@@ -16,3 +16,5 @@ CREATE DATABASE airbnb_prod
 # airbnb_user_prod has all permissions to airbnb_prod
 GRANT ALL PRIVILEGES ON airbnb_dev.* TO 'airbnb_user_dev'@'%';
 GRANT ALL PRIVILEGES ON airbnb_prod.* TO 'airbnb_user_prod'@'%';
+
+FLUSH PRIVILEGES;

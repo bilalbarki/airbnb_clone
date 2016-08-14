@@ -131,111 +131,111 @@ class ReviewTestCase(unittest.TestCase):
 		jsonified = json.loads(resp.data)
 		return jsonified, resp.status_code
 
-	# def test_get(self):
-	# 	self.create_user_rows()
+	def test_get(self):
+		self.create_user_rows()
 
-	# 	resp = self.app.get('/users/100/reviews')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(resp.status_code, 404)
+		resp = self.app.get('/users/100/reviews')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(resp.status_code, 404)
 
-	# 	resp = self.app.get('/users/1/reviews')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(len(jsonified), 0)
+		resp = self.app.get('/users/1/reviews')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 0)
 
-	# 	true_case =["test review", 1, 1]
-	# 	review_dictionary = self.review_dict(*true_case)
-	# 	jsonified, status = self.create_review_and_return_json(1, review_dictionary)
+		true_case =["test review", 1, 1]
+		review_dictionary = self.review_dict(*true_case)
+		jsonified, status = self.create_review_and_return_json(1, review_dictionary)
 
-	# 	resp = self.app.get('/users/1/reviews')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(len(jsonified), 1)
+		resp = self.app.get('/users/1/reviews')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 1)
 
-	# def test_post(self):
-	# 	true_case =["test review", 1, 1]
-	# 	review_dictionary = self.review_dict(*true_case)
-	# 	jsonified, status = self.create_review_and_return_json(1, review_dictionary)
-	# 	self.assertEqual(status, 404)
+	def test_post(self):
+		true_case =["test review", 1, 1]
+		review_dictionary = self.review_dict(*true_case)
+		jsonified, status = self.create_review_and_return_json(1, review_dictionary)
+		self.assertEqual(status, 404)
 
-	# 	true_cases = [
- #   			["test review", 1, 1],
- #   			["test review", None, 1]
- #   		]
+		true_cases = [
+   			["test review", 1, 1],
+   			["test review", None, 1]
+   		]
 
- #   		keys = ["message", "stars", "to_user_id"]
+   		keys = ["message", "stars", "to_user_id"]
 
- #   		count = 1
- #   		for case in true_cases:
- #   			review_dictionary = self.review_dict(*true_case)
-	# 		jsonified, status = self.create_review_and_return_json(1, review_dictionary)
+   		count = 1
+   		for case in true_cases:
+   			review_dictionary = self.review_dict(*true_case)
+			jsonified, status = self.create_review_and_return_json(1, review_dictionary)
    
    			
- #   			for key in jsonified:
- #   				if key == 'message':
- #   					self.assertEqual(jsonified[key], true_cases[count-1][0])
- #   				if key == 'stars':
- #   					if true_cases[count-1][1] != None:
- #   						self.assertEqual(jsonified[key], true_cases[count-1][1])
- #   					else:
- #   						self.assertEqual(jsonified[key], 0)
- #   				if key == 'to_user_id':
- #   					self.assertEqual(jsonified[key], true_cases[count-1][2])
- #   				if key == 'id':
- #   					self.assertEqual(jsonified[key], count)
- #   			self.tearDown()
- #   			self.setUp()
- #   			count+=1
+   			for key in jsonified:
+   				if key == 'message':
+   					self.assertEqual(jsonified[key], true_cases[count-1][0])
+   				if key == 'stars':
+   					if true_cases[count-1][1] != None:
+   						self.assertEqual(jsonified[key], true_cases[count-1][1])
+   					else:
+   						self.assertEqual(jsonified[key], 0)
+   				if key == 'to_user_id':
+   					self.assertEqual(jsonified[key], true_cases[count-1][2])
+   				if key == 'id':
+   					self.assertEqual(jsonified[key], count)
+   			self.tearDown()
+   			self.setUp()
+   			count+=1
 
-  #  	def test_get_by_review_id(self):
-		# self.create_user_rows()
+   	def test_get_by_review_id(self):
+		self.create_user_rows()
 
-		# resp = self.app.get('/users/100/reviews/1')
-		# jsonified = json.loads(resp.data)
-		# self.assertEqual(resp.status_code, 404)
+		resp = self.app.get('/users/100/reviews/1')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(resp.status_code, 404)
 
-		# resp = self.app.get('/users/100/reviews/1')
-		# jsonified = json.loads(resp.data)
-		# self.assertEqual(resp.status_code, 404)
+		resp = self.app.get('/users/100/reviews/1')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(resp.status_code, 404)
 
-		# true_cases =["test review", 1, 1]
-		# review_dictionary = self.review_dict(*true_cases)
-		# jsonified, status = self.create_review_and_return_json(1, review_dictionary)
+		true_cases =["test review", 1, 1]
+		review_dictionary = self.review_dict(*true_cases)
+		jsonified, status = self.create_review_and_return_json(1, review_dictionary)
 		
-		# for key in jsonified:
-  #  			if key == 'message':
-  #  				self.assertEqual(jsonified[key], true_cases[0])
-  #  			if key == 'stars':
-		# 		self.assertEqual(jsonified[key], true_cases[1])
-  #  			if key == 'to_user_id':
-  #  				self.assertEqual(jsonified[key], true_cases[2])
-  #  			if key == 'id':
-  #  				self.assertEqual(jsonified[key], 1)
+		for key in jsonified:
+   			if key == 'message':
+   				self.assertEqual(jsonified[key], true_cases[0])
+   			if key == 'stars':
+				self.assertEqual(jsonified[key], true_cases[1])
+   			if key == 'to_user_id':
+   				self.assertEqual(jsonified[key], true_cases[2])
+   			if key == 'id':
+   				self.assertEqual(jsonified[key], 1)
 
-  #  		resp = self.app.get('/users/1/reviews/100')
-		# jsonified = json.loads(resp.data)
-		# self.assertEqual(resp.status_code, 404)
+   		resp = self.app.get('/users/1/reviews/100')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(resp.status_code, 404)
 
-	# def test_delete_by_review_id(self):
-	# 	self.create_user_rows()
+	def test_delete_by_review_id(self):
+		self.create_user_rows()
 
-	# 	resp = self.app.delete('/users/100/reviews/1')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(resp.status_code, 404)
+		resp = self.app.delete('/users/100/reviews/1')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(resp.status_code, 404)
 
-	# 	true_case =["test review", 1, 1]
-	# 	review_dictionary = self.review_dict(*true_case)
-	# 	jsonified, status = self.create_review_and_return_json(1, review_dictionary)
+		true_case =["test review", 1, 1]
+		review_dictionary = self.review_dict(*true_case)
+		jsonified, status = self.create_review_and_return_json(1, review_dictionary)
 
-	# 	resp = self.app.get('/users/1/reviews')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(len(jsonified), 1)
+		resp = self.app.get('/users/1/reviews')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 1)
 
-	# 	resp = self.app.delete('/users/1/reviews/1')
-	# 	self.assertEqual(resp.status_code, 200)
+		resp = self.app.delete('/users/1/reviews/1')
+		self.assertEqual(resp.status_code, 200)
 		
-	# 	resp = self.app.get('/users/1/reviews')
-	# 	jsonified = json.loads(resp.data)
-	# 	self.assertEqual(len(jsonified), 0)
-	# 	
+		resp = self.app.get('/users/1/reviews')
+		jsonified = json.loads(resp.data)
+		self.assertEqual(len(jsonified), 0)
+		
 
 
 	def create_review_by_places(self, place_id, review_dictionary):

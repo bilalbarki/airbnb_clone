@@ -1,23 +1,43 @@
 import os
 
-AIRBNB_ENV = os.environ.get('AIRBNB_ENV')
-environments = ["development", "production", "test"]
-database_names = {environments[0]: "airbnb_dev", environments[1]: "airbnb_prod", environments[2]: "airbnb_test"}
-password_dev = os.environ.get('AIRBNB_DATABASE_PWD_DEV')
-password_prod = os.environ.get('AIRBNB_DATABASE_PWD_PROD')
-password_test = os.environ.get('AIRBNB_DATABASE_PWD_TEST')
+##############################################################
+# ===> SECTION: DATABASE INFO
 
+environments = [
+	   "development",
+	   "production", 
+	   "test",
+	]
+
+database_names = {
+	   environments[0]: "airbnb_dev", 
+	   environments[1]: "airbnb_prod", 
+	   environments[2]: "airbnb_test",
+	}
+
+############################################################
+# ===> SECTION: GET VALUES FROM ENV VARIABLES
+# @AIRBNB_ENV -> development/production/test
+# @PASSWORD_X -> password to access the specific database
+AIRBNB_ENV = os.environ.get('AIRBNB_ENV')
+PASSWORD_DEV = os.environ.get('AIRBNB_DATABASE_PWD_DEV')
+PASSWORD_PROD = os.environ.get('AIRBNB_DATABASE_PWD_PROD')
+PASSWORD_TEST = os.environ.get('AIRBNB_DATABASE_PWD_TEST')
+
+##############################################################
+# ===> SECTION: ERROR TESTING
 # check for errors in the environment variable AIRBNB_ENV
+
 if AIRBNB_ENV == None:
-    print "Please set AIRBNB_ENV environment variable to either %s or %s!" % (environments[0], environments[1])
+    print "Please set AIRBNB_ENV environment variable to either %s, %s or %s!" % (environments[0], environments[1], environments[2])
     quit()
 elif AIRBNB_ENV != environments[0] and AIRBNB_ENV != environments[1] and AIRBNB_ENV != environments[2]:
     print "AIRBNB_ENV environment variable has an unsupported value!"
     quit()
 
-#check if password was set properly in the respective envionment variable
+# check if password was set properly in the respective envionment variable
 if AIRBNB_ENV == environments[0]:
-    if password_dev == None:
+    if PASSWORD_DEV == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_DEV with your airnbnb_dev password!"
         quit()
 
@@ -26,12 +46,16 @@ elif AIRBNB_ENV == environments[1]:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_PROD with your airnbnb_prod password!"
         quit()
 else:
-    if password_test == None:
+    if PASSWORD_TEST == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_TEST with your airnbnb_test password!"
         quit()
 
+
+##############################################################
+# ===> SECTION: SET APPROPRIATE CONFIG VARIABLES
 # set appropriate variables depending on development or production
-if AIRBNB_ENV == environments[0]:
+
+if AIRBNB_ENV == environments[0]: # airbnb_dev
     DEBUG = True
     HOST = "localhost"
     PORT = 3333
@@ -41,10 +65,10 @@ if AIRBNB_ENV == environments[0]:
         "database": database_names[environments[0]],
         "port": 3306,
         "charset": "utf8",
-        "password": password_dev,
+        "password": PASSWORD_DEV,
     }
 
-elif AIRBNB_ENV == environments[1]:
+elif AIRBNB_ENV == environments[1]: # airbnb_prod
     DEBUG = False
     HOST = "0.0.0.0"
     PORT = 3000
@@ -54,10 +78,10 @@ elif AIRBNB_ENV == environments[1]:
         "database": database_names[environments[1]],
         "port": 3306,
         "charset": "utf8",
-        "password": password_prod,
+        "password": PASSWORD_PROD,
     }
 
-else:
+else: # airbnb_test
     DEBUG = False
     HOST = "localhost"
     PORT = 5555
@@ -67,5 +91,5 @@ else:
         "database": database_names[environments[2]],
         "port": 3306,
         "charset": "utf8",
-        "password": password_test,
+        "password": PASSWORD_TEST,
     }
