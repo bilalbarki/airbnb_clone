@@ -125,7 +125,7 @@ class PlaceTestCase(unittest.TestCase):
 
 		resp = self.app.get('/places')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 
    		true_case =["testPlace", "this is a description", 4, 3, 8, 100, 2.0, 3.0, 1, 1]
    			
@@ -134,7 +134,7 @@ class PlaceTestCase(unittest.TestCase):
    		
    		resp = self.app.get('/places')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 	def test_get(self):
 		self.create_state_rows()
@@ -181,8 +181,8 @@ class PlaceTestCase(unittest.TestCase):
 
 		resp_after_del = self.app.get('/places')
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/places/100')
@@ -284,7 +284,7 @@ class PlaceTestCase(unittest.TestCase):
 
 		resp = self.app.get('/states/1/cities/1/places')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 
    		true_case = ["testPlace", "", 4, 3, 8, 100, 2.0, 3.0, 1]
    			
@@ -293,6 +293,6 @@ class PlaceTestCase(unittest.TestCase):
    		
    		resp = self.app.get('/states/1/cities/1/places')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 

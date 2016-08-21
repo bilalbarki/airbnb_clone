@@ -21,7 +21,7 @@ def get_all_states():
 def create_new_state():
     post_data = request.values
     if 'name' not in post_data:
-        return {'code':400, 'msg':'bad request'}, 400
+        return {'code': 40000, 'msg': "Missing parameters"}, 400
 
     state_row, created = State.create_or_get(name = post_data['name'])
     if not created:

@@ -125,10 +125,10 @@ class PlaceBookTestCase(unittest.TestCase):
 		self.create_city_rows()
 		self.create_user_rows()
 		self.create_place_rows()
-		time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+		
 		true_cases = [
-   			[1, True, time, 3],
-   			[1, None, time, None],
+   			[1, True, "2016/08/18 01:33:29", 3],
+   			[1, None, "2017/08/18 01:33:29", None],
    		]
    		keys = ["user_id", "is_validated", "date_start", "number_nights"]
 
@@ -148,6 +148,12 @@ class PlaceBookTestCase(unittest.TestCase):
    			self.assertEqual(jsonified['id'], count)
    			count+=1
 
+   		# check booking overlap
+   		placebook_dictionary = self.placebook_dict(*true_cases[0])
+   		jsonified, status = self.create_placebook_and_return_json(1, placebook_dictionary)
+   		self.assertEqual(jsonified['code'], 110000)
+   		self.assertEqual(status, 410)
+
    	def test_list(self):
    		self.create_state_rows()
 		self.create_city_rows()
@@ -158,14 +164,14 @@ class PlaceBookTestCase(unittest.TestCase):
 
 		resp = self.app.get('/places/1/books')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 
 		placebook_dictionary = self.placebook_dict(*true_case)
    		jsonified, status = self.create_placebook_and_return_json(1, placebook_dictionary)
 
    		resp = self.app.get('/places/1/books')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 	# route /places/<place_id>/books/<book_id>
 	def test_get(self):
@@ -265,8 +271,8 @@ class PlaceBookTestCase(unittest.TestCase):
 		
 		resp_after_del = self.app.get('/places/1/books')
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/places/1/books/100')

@@ -21,13 +21,15 @@ def get_cities(state_id):
 @as_json
 def create_new_city(state_id):
     post_data = request.values
-    test = request.values.get
     if 'name' not in post_data:
-        return {"code":404, "msg":"not found"}, 404
-    
-    city_row, created = City.get_or_create(state=state_id, name=post_data['name'])
-    if not created:
-        out = {'code': 10002, 'msg': 'City already exists in this state'}
+        return {'code': 40000, 'msg': "Missing parameters"}, 400
+    try:
+        city_row, created = City.get_or_create(state=state_id, name=post_data['name'])
+        if not created:
+            out = {'code': 10002, 'msg': 'City already exists in this state'}
+            return out, 409
+    except City.DoesNotExist:
+        out = {'code': 10002, 'msg': 'state_id does not exist'}
         return out, 409
     return city_row.to_dict()
 

@@ -30,6 +30,12 @@ class UserTestCase(unittest.TestCase):
 	def create_user(self, user_dict):
 		return self.app.post('/users', data=user_dict)
 
+	def create_and_jsonify_user(self, data_set):
+		user_dictionary = self.user_dict(*data_set)
+		resp = self.create_user(user_dictionary)
+		jsonified = json.loads(resp.data)
+		return jsonified, resp.status_code
+
 	def test_create(self):
    		true_cases = [
    			["Jon", "Snow", "jon@snow.com", "toto1234", True],
@@ -44,11 +50,11 @@ class UserTestCase(unittest.TestCase):
 		]
 
 		duplicate_email_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
+		
 		id_count = 1
 		for data_set in true_cases:
-			user_dictionary = self.user_dict(*data_set)
-			resp = self.create_user(user_dictionary)
-			jsonified = json.loads(resp.data)
+			jsonified, status = self.create_and_jsonify_user(data_set)
+			self.assertEqual(status, 200)
 			self.assertEqual(jsonified['id'], id_count)
 			if len(data_set) == 4:
 				self.assertEqual(jsonified['is_admin'], False)
@@ -70,7 +76,7 @@ class UserTestCase(unittest.TestCase):
 	def test_list(self):
 		resp = self.app.get('/users')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 			
 		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
 		user_dictionary = self.user_dict(*true_case)
@@ -80,7 +86,7 @@ class UserTestCase(unittest.TestCase):
 		
 		resp = self.app.get('/users')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 	def test_get(self):
 		true_case = ["Jon", "Snow", "jon@snow.com", "toto1234", True]
@@ -111,8 +117,8 @@ class UserTestCase(unittest.TestCase):
 		self.assertEqual(resp.status_code, 200)
 		resp_after_del = self.app.get('/users')
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/users/100')

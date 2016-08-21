@@ -1,7 +1,6 @@
 import base
 from peewee import *
 from state import *
-from playhouse.shortcuts import model_to_dict
 
 class City(base.BaseModel):
     name = CharField(null=False, max_length=128)

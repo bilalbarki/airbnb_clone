@@ -154,12 +154,12 @@ class AmenitiesTestCase(unittest.TestCase):
 
 		resp = get_amenities()
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 		amenity_dictionary = self.name_dict("testing")
 		jsonified, status = self.create_amenity_and_return_json(amenity_dictionary)
 		resp = get_amenities()
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)		
+		self.assertEqual(len(jsonified['data']), 1)		
 
 	def test_delete(self):
 		def get_amenities():
@@ -173,8 +173,8 @@ class AmenitiesTestCase(unittest.TestCase):
 		self.assertEqual(resp.status_code, 200)
 		resp_after_del = get_amenities()
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/amenities/100')
@@ -194,7 +194,7 @@ class AmenitiesTestCase(unittest.TestCase):
 
 		resp = get_amenities(1)
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 		
 		# cases = [None, 1, 1]
 		# amenity_dictionary = self.name_dict(*cases)

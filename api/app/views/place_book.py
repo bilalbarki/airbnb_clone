@@ -50,8 +50,8 @@ def book_place(place_id):
     )
     # check overlap
     query = PlaceBook.select().where(PlaceBook.place == place_id)
-    if not query.exists():
-        return {"code":400, "msg":"Bad Request, place does not exist"}, 400
+    # if not query.exists():
+    #     return {"code":400, "msg":"Bad Request, place does not exist"}, 400
     
     new_book_end = place_book_dictionary['date_start'] + timedelta(days = place_book_dictionary['number_nights'])
     

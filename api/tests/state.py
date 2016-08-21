@@ -47,12 +47,12 @@ class StateTestCase(unittest.TestCase):
 	def test_list(self):
 		resp = self.app.get('/states')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 		state_dictionary = self.state_dict("Ohio")
 		jsonified, status = self.create_state_and_return_json(state_dictionary)
 		resp = self.app.get('/states')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 	def test_get(self):
 		name = "Ohio"
@@ -84,8 +84,8 @@ class StateTestCase(unittest.TestCase):
 		self.assertEqual(resp.status_code, 200)
 		resp_after_del = self.app.get('/states')
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/states/100')

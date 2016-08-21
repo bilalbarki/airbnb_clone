@@ -10,13 +10,13 @@ from app.models.place import Place
 from app.views.return_styles import ListStyle
 
 def review_dict(message, from_user_id, stars):
-		values = {
-			'message': message,
-			'user': int(from_user_id),
-		}
-		if stars != None:
-			values['stars'] = int(stars)
-		return values
+	values = {
+		'message': message,
+		'user': int(from_user_id),
+	}
+	if stars != None:
+		values['stars'] = int(stars)
+	return values
 
 '''listing endpoint'''
 @app.route('/users/<int:user_id>/reviews', methods=['GET'])

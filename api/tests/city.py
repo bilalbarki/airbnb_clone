@@ -66,21 +66,21 @@ class CityTestCase(unittest.TestCase):
 
 		resp = self.app.get('/states/1/cities')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 		city_dictionary = self.name_dict("Toledo")
 		jsonified, status = self.create_city_and_return_json(1, city_dictionary)
 		resp = self.app.get('/states/1/cities')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 		resp = self.app.get('/states/2/cities')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 0)
+		self.assertEqual(len(jsonified['data']), 0)
 		city_dictionary = self.name_dict("TestCity")
 		jsonified, status = self.create_city_and_return_json(2, city_dictionary)
 		resp = self.app.get('/states/2/cities')
 		jsonified = json.loads(resp.data)
-		self.assertEqual(len(jsonified), 1)
+		self.assertEqual(len(jsonified['data']), 1)
 
 	def test_get(self):
 		self.create_state_rows()
@@ -112,8 +112,8 @@ class CityTestCase(unittest.TestCase):
 		self.assertEqual(resp.status_code, 200)
 		resp_after_del = self.app.get('/states/1/cities')
 		jsonified_after_del = json.loads(resp_after_del.data)
-		self.assertEqual(len(jsonified_before_del), 1)
-		self.assertEqual(len(jsonified_after_del), 0)
+		self.assertEqual(len(jsonified_before_del['data']), 1)
+		self.assertEqual(len(jsonified_after_del['data']), 0)
 
 		# testing non-existent delete
 		resp = self.app.delete('/states/1/cities/100')

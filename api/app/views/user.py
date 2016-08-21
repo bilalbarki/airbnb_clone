@@ -39,7 +39,7 @@ def create_new_user():
     keys = ["first_name", "last_name", "email", "password"]
     for key in keys:
         if key not in post_data:
-            return {"code":400, "msg":"incorrect parameters"}, 400
+            return {'code': 40000, 'msg': "Missing parameters"}, 400
 
     user_dictionary = user_dict(
                 post_data['first_name'], 
@@ -66,7 +66,7 @@ def update_user(number):
     try:
         query = User.get(User.id == number)
     except User.DoesNotExist:
-        return {'error':'user does not exist'}, 404
+        return {'code': 40001, 'msg':'user does not exist'}, 404
     
     if 'first_name' in post_data:
         query.first_name = post_data['first_name']
@@ -88,7 +88,7 @@ def delete_user(number):
     try:
         query = User.get(User.id == number)
     except User.DoesNotExist:
-        return {"code":404, "msg":"not found"}, 404
+        return {"code":40001, "msg":"not found"}, 404
     query = query.get()
     out_json = query.to_dict()
     query.delete_instance()
@@ -100,5 +100,5 @@ def get_user(number):
     try:
         query = User.get(User.id == number)
     except User.DoesNotExist:
-        return {'error':'user does not exist'}, 404
+        return {'code':40001, 'error':'user does not exist'}, 404
     return query.to_dict()

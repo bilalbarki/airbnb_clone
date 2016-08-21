@@ -12,7 +12,8 @@ class Review(base.BaseModel):
 		from review_user import ReviewUser
 		#from_user_query = User.get(User.id == self.user)
 		review_dict = super(Review, self).to_dict()
-
+		if 'reviewuser' in dir(self):
+			print "ggg"
 		try:
 			reviewplace_query = ReviewPlace.get(ReviewPlace.review == self.id)
 			reviewplace = reviewplace_query.place_id

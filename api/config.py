@@ -42,7 +42,7 @@ if AIRBNB_ENV == environments[0]:
         quit()
 
 elif AIRBNB_ENV == environments[1]:
-    if password_env == None:
+    if PASSWORD_PROD == None:
         print "Please set the environment variable AIRBNB_DATABASE_PWD_PROD with your airnbnb_prod password!"
         quit()
 else:
@@ -59,6 +59,7 @@ if AIRBNB_ENV == environments[0]: # airbnb_dev
     DEBUG = True
     HOST = "localhost"
     PORT = 3333
+    ALLOW_CORS = "*"
     DATABASE = {
         "host": "158.69.92.163", 
         "user": "airbnb_user_dev",
@@ -72,6 +73,7 @@ elif AIRBNB_ENV == environments[1]: # airbnb_prod
     DEBUG = False
     HOST = "0.0.0.0"
     PORT = 3000
+    ALLOW_CORS = ["158.69.92.163","52.91.150.68"]
     DATABASE = {
         "host": "158.69.92.163",
         "user": "airbnb_user_prod",
@@ -85,6 +87,7 @@ else: # airbnb_test
     DEBUG = False
     HOST = "localhost"
     PORT = 5555
+    ALLOW_CORS = "*"
     DATABASE = {
         "host": "158.69.92.163",
         "user": "airbnb_user_test",
