@@ -4,7 +4,7 @@ from fabric.api import *
 #env.user = 'admin'
 # the server where the commands are executed
 bilal_hosts = ['admin@158.69.92.163', 'ubuntu@52.91.150.68']
-marine_hosts = ['admin@158.69.92.163', 'ubuntu@52.91.150.68']
+marine_hosts = ['admin@158.69.77.113', 'ubuntu@54.175.88.51']
 #env.hosts = ['158.69.92.163']
 
 #file/folder name
@@ -24,7 +24,7 @@ def pack():
     local('tar czf /tmp/%s.tar.gz .' % (name))
 
 def deploy():
-    #test()
+    test()
     # create a tarball from local source
     pack()
     # upload the source tarball to the temporary folder on the server
