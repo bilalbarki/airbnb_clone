@@ -26,10 +26,10 @@ class ListStyle():
 		# 	paging['next'] = page + 1
 
 		if paging['prev'] != None:
-			paging['prev'] = "%s%s%d%s%d" % (request.base_url, "?page=", paging['prev'], "?number=", number)
+			paging['prev'] = "%s%s%d%s%d" % (request.base_url, "?page=", paging['prev'], "&number=", number)
 
 		if paging['next'] != None:
-			paging['next'] = "%s%s%d%s%d" % (request.base_url, "?page=", paging['next'], "?number=", number)
+			paging['next'] = "%s%s%d%s%d" % (request.base_url, "?page=", paging['next'], "&number=", number)
 
 		select = select.paginate(page, number)
 		for obj in select:
