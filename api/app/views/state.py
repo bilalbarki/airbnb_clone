@@ -5,17 +5,15 @@ from app.models.state import State
 from flask_json import as_json
 from app.views.return_styles import ListStyle
 
+'''GET: gets all users with pagination <url/states>'''
 '''listing endpoint'''
 @app.route('/states', methods=['GET'])
 @as_json
 def get_all_states():
-    # states = []
     query = State.select()
-    # for state in query:
-    #     states.append(state.to_dict())
-    # return jsonify(states)
     return ListStyle.list(query,request)
 
+'''POST: creates a new state <url/states>'''
 @app.route('/states', methods=['POST'])
 @as_json
 def create_new_state():
@@ -29,6 +27,7 @@ def create_new_state():
         return out, 409
     return state_row.to_dict()
 
+'''GET: gets a single state <url/states/state_id>'''
 @app.route('/states/<int:number>', methods=['GET'])
 @as_json
 def get_single_state(number):
@@ -38,6 +37,7 @@ def get_single_state(number):
         return {'code':404, 'msg':'state not found'}, 404
     return query.to_dict()
 
+'''DELETE: deletes a state <url/states/states_id>'''
 @app.route('/states/<int:number>', methods=['DELETE'])
 @as_json
 def delete_state(number):

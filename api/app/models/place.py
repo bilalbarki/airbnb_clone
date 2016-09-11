@@ -3,6 +3,7 @@ from peewee import *
 from user import *
 from city import *
 
+'''defines table for Places'''
 class Place(base.BaseModel):
     owner = ForeignKeyField(related_name="places", rel_model=User)
     city = ForeignKeyField(related_name="places", rel_model=City)
@@ -15,12 +16,9 @@ class Place(base.BaseModel):
     latitude = FloatField()
     longitude = FloatField()
 
+    '''returns row of place as a dict'''
     def to_dict(self):
         place_dict = super(Place, self).to_dict()
-        # t = (City.id == self.city) & (User.id == self.owner)
-        # query = City.select(City, User).join(User, on=t).get()
-        #city = City.get(City.id == self.city)
-        #owner = User.get(User.id == self.owner)
         
         place_dict.update({
             'number_bathrooms': self.number_bathrooms,

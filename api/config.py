@@ -27,7 +27,7 @@ PASSWORD_TEST = os.environ.get('AIRBNB_DATABASE_PWD_TEST')
 ##############################################################
 # ===> SECTION: ERROR TESTING
 # check for errors in the environment variable AIRBNB_ENV
-
+# Not recommended for production use
 if AIRBNB_ENV == None:
     print "Please set AIRBNB_ENV environment variable to either %s, %s or %s!" % (environments[0], environments[1], environments[2])
     quit()
@@ -73,7 +73,7 @@ elif AIRBNB_ENV == environments[1]: # airbnb_prod
     DEBUG = False
     HOST = "0.0.0.0"
     PORT = 3000
-    ALLOW_CORS = ["158.69.92.163","52.91.150.68"]
+    ALLOW_CORS = ["158.69.92.163","52.91.150.68", "http://web.bilalkhan.tech"]
     DATABASE = {
         "host": "158.69.92.163",
         "user": "airbnb_user_prod",

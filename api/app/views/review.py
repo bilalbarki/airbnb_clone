@@ -9,6 +9,7 @@ from app.models.review_place import ReviewPlace
 from app.models.place import Place
 from app.views.return_styles import ListStyle
 
+'''receives post data for reviews and returns a dict'''
 def review_dict(message, from_user_id, stars):
 	values = {
 		'message': message,
@@ -18,29 +19,21 @@ def review_dict(message, from_user_id, stars):
 		values['stars'] = int(stars)
 	return values
 
+'''GET: gets all reviews a user has received with pagination <url/users/user_id/reviews>'''
 '''listing endpoint'''
 @app.route('/users/<int:user_id>/reviews', methods=['GET'])
 @as_json
 def get_reviews(user_id):
-	# data = []
 	query = Review.select().join(ReviewUser).where(ReviewUser.user == user_id)
-	# for row in query:
-	# 	data.append(row.to_dict())
-	# return jsonify(data)
 	return ListStyle.list(query,request)
 
+'''POST: creates a new review for a user, the user's user_id to which the review is being posted must be mentioned in the URL <url/users/user_id/reviews>'''
 @app.route('/users/<int:user_id>/reviews', methods=['POST'])
 @as_json
 def post_review(user_id):
     post_data = request.values
-    if 'message' not in post_data and 'from_user_id' not in post_data:
+    if 'message' not in post_data or 'user_id' not in post_data:
     	return {"code": 400, "msg":"bad request, incomplete parameters"}, 400
-    
-    # try:
-    # 	user_query = User.get(User.id == int(post_data['from_user_id']))
-    # except:
-    # 	return {"code": 404, "msg":"User does not exist or bad value of from_user_id"}, 404
-
     try:
     	user_to_query = User.get(User.id == user_id)
     except:
@@ -48,18 +41,13 @@ def post_review(user_id):
 
     review_dictionary = review_dict(
     	post_data['message'],
-    	post_data['from_user_id'],
+    	post_data['user_id'],
     	post_data.get('stars'),
     )
 
     new_review, created = Review.create_or_get(**review_dictionary)
     if not created:
     	return {"code": 404, "msg":"from_user does not exist"}, 404
-    
-    # if 'stars' in post_data:
-    # 	new_review.stars = int(post_data['stars'])
-    # 	new_review.save()
-
     new_reviewUser, created = ReviewUser.create_or_get(
     	user = user_id,
     	review = new_review,
@@ -68,6 +56,7 @@ def post_review(user_id):
     	return {"code": 404, "msg":"bad request"}, 404
     return new_review.to_dict()
 
+'''GET: gets a single review, identified by review_id, of a user <url/users/user_id/reviews/review_id>'''
 @app.route('/users/<int:user_id>/reviews/<int:review_id>', methods=['GET'])
 @as_json
 def get_review(user_id, review_id):
@@ -77,6 +66,7 @@ def get_review(user_id, review_id):
 		return {"code": 404, "msg":"There are no reviews for this user"}, 404
 	return rev_query.to_dict()
 
+'''DELETE: deletes a review, identified by review_id, received by a user <url/users/user_id/reviews/review_id>'''
 @app.route('/users/<int:user_id>/reviews/<int:review_id>', methods=['DELETE'])
 @as_json
 def delete_review(user_id, review_id):
@@ -90,49 +80,28 @@ def delete_review(user_id, review_id):
 	rev_query.delete_instance()
 	return out_dict
 
+'''GET: gets all reviews a place has received with pagination <url/places/place_id/reviews>'''
 '''listing endpoint'''
 @app.route('/places/<int:place_id>/reviews', methods=['GET'])
 @as_json
 def get_reviews_by_place(place_id):
-	# reviews = []
-	# check_place = Place.select().where(Place.id == place_id)
-	# if not check_place.exists():
-	# 	return jsonify({"code": 404, "msg":"User does not exist"}), 404
 	query = Review.select().join(ReviewPlace).where(ReviewPlace.place == place_id)
-	#if not qq.exists():
-	#	return {"code": 404, "msg":"User does not exist"}, 404
-	# for row in query:
-	# 	reviews.append(row.to_dict())
-	# return jsonify(reviews)
 	return ListStyle.list(query,request)
 
-
-	# reviewplace_query = ReviewPlace.select().where(ReviewPlace.place == place_id)
-	# #except:
-	# #	return jsonify(reviews)
-	# for row in reviewplace_query:
-	# 	review_query = Review.get(Review.id == row.review)
-	# 	reviews.append(review_query.to_dict())
-	# return jsonify(reviews)
-
+'''POST: creates a new review for a place, the place's place_id to which the review is being posted must be mentioned in the URL <url/places/place_id/reviews>'''
 @app.route('/places/<int:place_id>/reviews', methods=['POST'])
 @as_json
 def post_review_by_place(place_id):
 	post_data = request.values
-	if 'message' not in post_data and 'from_user_id' not in post_data:
+	if 'message' not in post_data or 'user_id' not in post_data:
 		return {"code": 400, "msg":"bad request, incomplete parameters"}, 400
 	try:
 		place_get = Place.get(Place.id == place_id)
 	except Place.DoesNotExist:
 		return {'code': 10004, 'msg': 'Place does not exist'}, 404
-	# try:
-	# 	user_get = User.get(User.id == int(post_data['from_user_id']))
-	# except:
-	# 	return {'code': 10004, 'msg': 'User does not exist'}, 400
-
 	review_dictionary = review_dict(
     	post_data['message'],
-    	post_data['from_user_id'],
+    	post_data['user_id'],
     	post_data.get('stars'),
     )
 
@@ -142,6 +111,7 @@ def post_review_by_place(place_id):
 	new_review_place = ReviewPlace.create(place=place_id, review=new_review)
 	return new_review.to_dict()
 
+'''GET: gets a single review, identified by review_id, of a place <url/places/place_id/reviews/review_id>'''
 @app.route('/places/<int:place_id>/reviews/<int:review_id>', methods=['GET'])
 @as_json
 def get_all_reviews_by_place(place_id, review_id):
@@ -151,6 +121,7 @@ def get_all_reviews_by_place(place_id, review_id):
 		return {'code': 10004, 'msg': 'Place does not exist'}, 400
 	return review_query.to_dict()
 
+'''DELETE: deletes a review, identified by review_id, of a place <url/places/place_id/reviews/review_id>'''
 @app.route('/places/<int:place_id>/reviews/<int:review_id>', methods=['DELETE'])
 @as_json
 def delete_all_reviews_by_place(place_id, review_id):

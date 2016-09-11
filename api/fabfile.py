@@ -1,11 +1,8 @@
 from fabric.api import *
 
-# the user to use for the remote commands
-#env.user = 'admin'
 # the server where the commands are executed
 bilal_hosts = ['admin@158.69.92.163', 'ubuntu@52.91.150.68']
 marine_hosts = ['admin@158.69.77.113', 'ubuntu@54.175.88.51']
-#env.hosts = ['158.69.92.163']
 
 #file/folder name
 name = 'airbnb_clone'
@@ -20,7 +17,6 @@ def test():
 
 def pack():
     # create a tarball from local source folder
-    #local('tar czf %s.tar.gz -C %s %s' % (name, local_dir, name))
     local('tar czf /tmp/%s.tar.gz .' % (name))
 
 def deploy():
@@ -45,6 +41,7 @@ def deploy():
         run('rm -rf /tmp/%s /tmp/%s.tar.gz' % (name, name))
     local('rm -f /tmp/%s.tar.gz' % name)
 
+'''deploy api files to servers of Bilal Khan'''
 @hosts(bilal_hosts)  
 def deploy_bilal():
     global env
@@ -52,6 +49,7 @@ def deploy_bilal():
     env.key_filename = '~/.ssh_holberton/id_rsa_holberton'
     deploy()
 
+'''deploy api files to servers of Marine Dejean'''
 @hosts(marine_hosts)
 def deploy_marine():
     deploy()

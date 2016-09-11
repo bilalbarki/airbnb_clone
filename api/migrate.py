@@ -12,7 +12,7 @@ from app.models.review_place import ReviewPlace
 from app.models.review_user import ReviewUser
 
 
-'''create tables'''
+'''script for creating all tables'''
 db.connect()
 db.create_tables([User, State, City, Place, PlaceBook, Amenity, PlaceAmenities, Review, ReviewPlace, ReviewUser], safe = True)
 db.close()

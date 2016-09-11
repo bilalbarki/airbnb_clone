@@ -3,6 +3,7 @@ from peewee import *
 from place import *
 from user import *
 
+'''defines table for place bookings'''
 class PlaceBook(base.BaseModel):
     place = ForeignKeyField(rel_model=Place)
     user = ForeignKeyField(related_name="places_booked", rel_model=User)
@@ -10,6 +11,7 @@ class PlaceBook(base.BaseModel):
     date_start = DateTimeField(null=False, formats="%Y/%m/%d %H:%M:%S")
     number_nights = IntegerField(default=1)
 
+    '''returns placebook row as a dict'''
     def to_dict(self):
         place_book_dict = super(PlaceBook, self).to_dict()
 

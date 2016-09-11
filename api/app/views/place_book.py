@@ -7,6 +7,7 @@ from app import app
 from datetime import datetime, timedelta
 from app.views.return_styles import ListStyle
 
+'''receives post data for placebook and returns a dict'''
 def placebook_dict(place_id, user_id = None, is_validated = None, date_start = None, number_nights = None):
     values = {
         'user': int(user_id),
@@ -21,17 +22,15 @@ def placebook_dict(place_id, user_id = None, is_validated = None, date_start = N
         values['number_nights'] = 1
     return values
 
+'''GET: Gets all bookings for places with pagination <url/places/place_id/books>'''
 '''listing endpoint'''
 @app.route('/places/<int:place_id>/books', methods=['GET'])
 @as_json
 def get_place_books(place_id):
-    # place_books = []
     query = PlaceBook.select().where(PlaceBook.place == place_id)
-    # for place_book in query:
-    #     place_books.append(place_book.to_dict())
-    # return jsonify(place_books)
     return ListStyle.list(query,request)
 
+'''POST: Create a new booking for a place <url/places/place_id/books>'''
 @app.route('/places/<int:place_id>/books', methods=['POST'])
 @as_json
 def book_place(place_id):
@@ -50,9 +49,6 @@ def book_place(place_id):
     )
     # check overlap
     query = PlaceBook.select().where(PlaceBook.place == place_id)
-    # if not query.exists():
-    #     return {"code":400, "msg":"Bad Request, place does not exist"}, 400
-    
     new_book_end = place_book_dictionary['date_start'] + timedelta(days = place_book_dictionary['number_nights'])
     
     for booking in query:
@@ -66,6 +62,7 @@ def book_place(place_id):
         return {"code":400, "msg":"bad request"}, 404
     return new_book.to_dict()
 
+'''GET: Gets a single booking for a plce <url/places/place_id/books/book_id>'''
 @app.route('/places/<int:place_id>/books/<book_id>', methods=['GET'])
 @as_json
 def get_single_booking(place_id, book_id):
@@ -75,6 +72,7 @@ def get_single_booking(place_id, book_id):
         return {"code":404, "msg":"not found"}, 404
     return get_booking.to_dict()
 
+'''DELETE: Deletes a booking for a place <url/places/place_id/books/book_id>'''
 @app.route('/places/<int:place_id>/books/<int:book_id>', methods=['DELETE'])
 @as_json
 def del_single_book(place_id, book_id):
@@ -86,6 +84,7 @@ def del_single_book(place_id, book_id):
     query.delete_instance()
     return out_dict
 
+'''PUT: Changes data for an existing booking <url/places/places_id/books/book_id>'''
 @app.route('/places/<int:place_id>/books/<int:book_id>', methods=['PUT'])
 @as_json
 def change_book(place_id, book_id):

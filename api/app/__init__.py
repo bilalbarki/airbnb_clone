@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_json import FlaskJSON
-#from app.views import *
 from flask_cors import CORS, cross_origin
 import config
 

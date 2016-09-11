@@ -8,25 +8,7 @@ from flask_json import as_json
 from datetime import datetime, timedelta
 from app.views.return_styles import ListStyle
 
-# def place_dict(name = None, description = None, number_rooms = None, number_bathrooms = None, max_guest = None, price_by_night = None, latitude = None, longitude = None, owner_id = None, city_id = None):
-#     values = {
-#         'owner': int(owner_id),
-#         'name': name,
-#         'city': int(city_id),
-#         'description': description,
-#         'latitude': float(latitude),
-#         'longitude': float(longitude),
-#     }
-#     if number_rooms != None:
-#         values['number_rooms'] = int(number_rooms)
-#     if number_bathrooms != None:
-#         values['number_bathrooms'] = int(number_bathrooms)
-#     if max_guest != None:
-#         values['max_guest'] = int(max_guest)
-#     if price_by_night != None:
-#         values['price_by_night'] = int(price_by_night)
-#     return values
-
+'''receives post data for place and returns a dict'''
 def place_dict(name = None, description = None, number_rooms = None, number_bathrooms = None, max_guest = None, price_by_night = None, latitude = None, longitude = None, owner_id = None, city_id = None):
     values = {}
     if name != None:
@@ -51,17 +33,16 @@ def place_dict(name = None, description = None, number_rooms = None, number_bath
         values['city'] = int(city_id)
     return values
 
+'''GET: Gets all places with pagination <url/places>'''
 '''listing endpoint'''
 @app.route('/places', methods=['GET'])
 @as_json
 def get_places():
     places = []
     query = Place.select()
-    # for place in query:
-    #     places.append(place.to_dict())
-    # return jsonify(places)
     return ListStyle.list(query,request)
 
+'''POST: Create a new place <url/places>'''
 @app.route('/places', methods=['POST'])
 @as_json
 def create_new_place():
@@ -89,6 +70,7 @@ def create_new_place():
         return {"code":404, "msg":"Parameters not correct"}, 404
     return new_place.to_dict()
 
+'''GET: Get a single place identified by place_id <url/places/place_id>'''
 @app.route('/places/<int:place_id>', methods=['GET'])
 @as_json
 def get_single_place(place_id):
@@ -98,6 +80,7 @@ def get_single_place(place_id):
         return {'code':404, "msg":"not found"}, 404
     return new_place.to_dict()
 
+'''DELETE: delete a place identified by place_id <url/places/place_id>'''
 @app.route('/places/<int:place_id>', methods=['DELETE'])
 @as_json
 def delete_single_place(place_id):
@@ -109,6 +92,7 @@ def delete_single_place(place_id):
     query.delete_instance()
     return out_dict
 
+'''PUT: Update data of an existing place identified by place_id <url/places/place_id>'''
 @app.route('/places/<int:place_id>', methods=['PUT'])
 @as_json
 def put_place(place_id):
@@ -117,27 +101,6 @@ def put_place(place_id):
         place = Place.get(Place.id == place_id)
     except Place.DoesNotExist:
         return {"code":404, "msg":"not found"}, 404
-    
-    # place_dictionary = place_dict(
-    #     post_data.get('name'),
-    #     post_data.get('description'),
-    #     post_data.get('number_rooms'),
-    #     post_data.get('number_bathrooms'),
-    #     post_data.get('max_guest'),
-    #     post_data.get('price_by_night'),
-    #     post_data.get('latitude'),
-    #     post_data.get('longitude'),      
-    # )
-
-    # q = Place.update(**place_dictionary).where(Place.id == place_id)
-    # q.execute()
-    # print q
-    # if q == 1:
-    #     place = Place.get(Place.id == place_id)
-    #     return place.to_dict()
-    # else:
-    #     return {"code":404, "msg":"not found"}, 404
-    # return {"code":404, "msg":"not found"}, 404
     
     if 'name' in post_data:
         place.name = post_data['name']
@@ -158,18 +121,15 @@ def put_place(place_id):
     place.save()
     return place.to_dict()
 
+'''GET: Gets all places in a city with pagination, state_id and city_id must be provided in the URL <url/states/state_id/cities/city_id/places>'''
 '''listing endpoint'''
 @app.route('/states/<int:state_id>/cities/<int:city_id>/places', methods=['GET'])
 @as_json
 def places_by_city(state_id, city_id):
-    # places = []
     query = Place.select().join(City).where(Place.city == city_id, City.state == state_id)
-
-    # for place in query:
-    #     places.append(place.to_dict())
-    # return jsonify(places)
     return ListStyle.list(query,request)
 
+'''POST: creates a new place in a city, state_id and city_id must be provided in the URL <url/states/state_id/cities/city_id/places>'''
 @app.route('/states/<int:state_id>/cities/<int:city_id>/places', methods=['POST'])
 @as_json
 def create_place_by_city(state_id, city_id):
@@ -203,17 +163,15 @@ def create_place_by_city(state_id, city_id):
 
     return new_place.to_dict()
 
+'''GET: Gets all places in a state, state_id must be provided in the URL <url/places>'''
 '''listing endpoint'''
 @app.route('/states/<int:state_id>/places', methods=['GET'])
 @as_json
 def places_by_state(state_id):
     query = Place.select().join(City).where(City.state == state_id)
-    # places = []
-    # for place in query:
-    #     places.append(place.to_dict())
-    # return jsonify(places)
     return ListStyle.list(query,request)
 
+'''POST: Checks availability of a place for booking on a given date <url/places/place_id/available>'''
 @app.route('/places/<int:place_id>/available', methods=['POST'])
 @as_json
 def check_places_availability(place_id):

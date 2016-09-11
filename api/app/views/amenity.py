@@ -8,18 +8,15 @@ from app.models.place_amenity import PlaceAmenities
 from flask_json import as_json
 from app.views.return_styles import ListStyle
 
+'''GET: Gets all amenities with pagination <url/amenities>'''
 '''listing endpoint'''
 @app.route('/amenities', methods=['GET'])
 @as_json
 def get_amenities():
-    # amenities = []
     query = Amenity.select()
-    # for amenity in query:
-    #     amenities.append(amenity.to_dict())
-    # return jsonify(amenities)
     return ListStyle.list(query,request)
 
-
+'''POST: Creates a new amenity <url/amenities>'''
 @app.route('/amenities', methods=['POST'])
 @as_json
 def create_amenity():
@@ -33,7 +30,7 @@ def create_amenity():
         return out, 409
     return new_amenity.to_dict()
         
-
+'''DELETE: Deletes an existing amenity, amenity_id must be provided in the URL <url/amenities/amenity_id>'''
 @app.route('/amenities/<int:amenity_id>', methods=['DELETE'])
 @as_json
 def del_amenity(amenity_id):
@@ -45,6 +42,7 @@ def del_amenity(amenity_id):
     query.delete_instance()
     return out_dict
 
+'''GET: Gets a single amenity data, amenity_id must be provided in the URL <url/amenities/amenity_id>'''
 @app.route('/amenities/<int:amenity_id>', methods=['GET'])
 @as_json
 def get_amenity_by_id(amenity_id):
@@ -54,17 +52,15 @@ def get_amenity_by_id(amenity_id):
         return {"code":404, "msg": "not found"}, 404
     return get_amenity.to_dict()
 
+'''GET: Gets all amenities of a place with pagination, place_id must be provided in the URL <url/places/place_id/amenities>'''
 '''listing endpoint'''
 @app.route('/places/<int:place_id>/amenities', methods=['GET'])
 @as_json
 def get_amenities_by_place(place_id):
-    # amenities = []
     query = Amenity.select().join(PlaceAmenities).where(PlaceAmenities.place == place_id)
-    # for row in query:
-    #     amenities.append(row.to_dict())
-    # return jsonify(amenities)
     return ListStyle.list(query,request)
 
+'''POST: Links an amenity with a place, place_id and amenity_id must be provided in the URL <url/places/place_id/amenities/amenity_id>'''
 @app.route('/places/<int:place_id>/amenities/<int:amenity_id>', methods=['POST'])
 @as_json
 def create_amenityPlace(place_id, amenity_id):
@@ -73,6 +69,7 @@ def create_amenityPlace(place_id, amenity_id):
         return {'code': 400, 'msg': 'Bad request'}, 400
     return new_place_amenity.amenity.to_dict()
 
+'''DELETE: Deletes an existing amenity, place_id and amenity_id must be provided in the URL <url/places/place_id/amenities/amenity_id>'''
 @app.route('/places/<int:place_id>/amenities/<int:amenity_id>', methods=['DELETE'])
 @as_json
 def delete_amenityPlace(place_id, amenity_id):

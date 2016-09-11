@@ -6,17 +6,15 @@ from app.models.state import State
 from flask_json import as_json
 from app.views.return_styles import ListStyle
 
+'''GET: Gets all cities with pagination, state_id must be provided in the URL <url/states/state_id/cities>'''
 '''listing endpoint'''
 @app.route('/states/<int:state_id>/cities', methods=['GET'])
 @as_json
 def get_cities(state_id):
-    # cities = []
     query = City.select().join(State).where(State.id == state_id)
-    # for city in query:
-    #     cities.append(city.to_dict())
-    # return jsonify(cities)
     return ListStyle.list(query,request)
 
+'''POST: Creates a new city in a state, state_id must be provided in the URL <url/states/state_id/cities>'''
 @app.route('/states/<int:state_id>/cities', methods=['POST'])
 @as_json
 def create_new_city(state_id):
@@ -33,6 +31,7 @@ def create_new_city(state_id):
         return out, 409
     return city_row.to_dict()
 
+'''GET: Gets a single city data, state_id and city_id must be provided in the URL <url/states/state_id/cities/city_id>'''
 @app.route('/states/<int:state_id>/cities/<int:city_id>', methods=['GET'])
 @as_json
 def get_single_city(state_id, city_id):
@@ -42,6 +41,7 @@ def get_single_city(state_id, city_id):
         return {"code":404, "msg":"city not found"}, 404
     return query.to_dict()
 
+'''DELETE: deletes a city, state_id and city_id must be provided in the URL <url/states/state_id/cities/city_id>'''
 @app.route('/states/<int:state_id>/cities/<int:city_id>', methods=['DELETE'])
 @as_json
 def delete_single_city(state_id, city_id):

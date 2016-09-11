@@ -2,15 +2,17 @@ from peewee import *
 import base
 from user import User
 
+'''defines review for user and place'''
 class Review(base.BaseModel):
 	message = TextField(null=False)
 	stars = IntegerField(default=0)
 	user = ForeignKeyField(related_name="reviews", rel_model=User, on_delete='CASCADE')
 
+	'''returns row of review as a dict'''
 	def to_dict(self):
 		from review_place import ReviewPlace
 		from review_user import ReviewUser
-		#from_user_query = User.get(User.id == self.user)
+		
 		review_dict = super(Review, self).to_dict()
 		if 'reviewuser' in dir(self):
 			print "ggg"

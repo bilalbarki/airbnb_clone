@@ -2,7 +2,7 @@ from peewee import *
 from datetime import datetime
 import config
 
-# Connect to the MySQL database, either production or development, depending on the configuration
+# Defines MySQLDatabase details, either production, development or test, depending on the configuration
 db = MySQLDatabase(
     host=config.DATABASE['host'], 
     port=config.DATABASE['port'], 
@@ -12,11 +12,13 @@ db = MySQLDatabase(
     charset=config.DATABASE['charset']
 )
 
+'''base model used as a base for most other tables'''
 class BaseModel(Model):
     id = PrimaryKeyField(unique = True)
     created_at = DateTimeField(default=datetime.now(), formats="%Y/%m/%d %H:%M:%S")
     updated_at = DateTimeField(default=datetime.now(), formats="%Y/%m/%d %H:%M:%S")
     
+    '''override of save method, runs just before saving data to database'''
     def save(self, *args, **kwargs):
         if self._get_pk_value() is None:
             # this is a create operation
@@ -24,6 +26,7 @@ class BaseModel(Model):
         self.updated_at = datetime.now()
         return super(BaseModel, self).save(*args, **kwargs)
 
+    '''returns base model data as a dict'''
     def to_dict(self):
         return {
             'id': self.id,

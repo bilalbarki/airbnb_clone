@@ -4,6 +4,7 @@ from app.models.user import User
 from flask_json import as_json
 from app.views.return_styles import ListStyle
 
+'''receives post data for user and returns a dict'''
 def user_dict(first_name = None, last_name = None, email = None, password = None, is_admin = None):
     values = {}
     if 'first_name' != None:
@@ -18,7 +19,7 @@ def user_dict(first_name = None, last_name = None, email = None, password = None
         values['is_admin'] = True
     return values
 
-'''Get all users <url/users>'''
+'''GET: Gets all users with pagination <url/users>'''
 '''listing endpoint'''
 @app.route('/users', methods=['GET'])
 @as_json
@@ -30,7 +31,7 @@ def get_all_users():
     #     all_users.append(user.to_dict())
     # return jsonify(all_users)
 
-'''POST: create new user <url/users>'''
+'''POST: creates a new user <url/users>'''
 @app.route('/users', methods=['POST'])
 @as_json
 def create_new_user():
@@ -58,6 +59,7 @@ def create_new_user():
         return out, 409
     return user_row.to_dict()
 
+'''PUT: changes existing user info <url/users/user_id>'''
 @app.route('/users/<int:number>', methods=['PUT'])
 @as_json
 def update_user(number):
@@ -82,6 +84,7 @@ def update_user(number):
     query.save()
     return query.to_dict()
 
+'''DELETE: deletes a user <url/users/user_id>'''
 @app.route('/users/<int:number>', methods=['DELETE'])
 @as_json
 def delete_user(number):
@@ -94,6 +97,7 @@ def delete_user(number):
     query.delete_instance()
     return out_json
 
+'''GET: gets a single user <url/users/user_id>'''
 @app.route('/users/<int:number>', methods=['GET'])
 @as_json
 def get_user(number):

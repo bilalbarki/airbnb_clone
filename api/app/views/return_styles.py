@@ -1,3 +1,4 @@
+'''for pagination'''
 class ListStyle():
 	@staticmethod
 	def list(select, request):

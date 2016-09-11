@@ -3,8 +3,7 @@ from app import app
 from app.models.base import db
 from flask_json import as_json
 
-app.config['JSON_ADD_STATUS'] = False
-
+'''for testing api status'''
 @app.route('/', methods=['GET'])
 @as_json
 def index():
@@ -20,13 +19,8 @@ def before_request():
 def after_request():
     db.close()
 
+'''an error handler for incorrect request'''
 @app.errorhandler(404)
 @as_json
 def not_found(error=None):
     return dict(code=404, msg="not found"), 404
-
-
-'''@app.errorhandler(404)
-def page_not_found(error=None):
-    return jsonify(code=404, msg="not found"), 404
-'''

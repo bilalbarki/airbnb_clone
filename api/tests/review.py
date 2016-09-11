@@ -118,7 +118,7 @@ class ReviewTestCase(unittest.TestCase):
 		if stars != None:
 			values['stars'] = stars
 		if from_user_id != None:
-			values['from_user_id'] = from_user_id
+			values['user_id'] = from_user_id
 		return values
 
 
