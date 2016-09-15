@@ -40,6 +40,4 @@ peewee_logger = logging.getLogger('peewee')
 peewee_logger.setLevel(logging.DEBUG)
 peewee_logger.addHandler(peewee_handler)
 
-
-
 from app.views import *
