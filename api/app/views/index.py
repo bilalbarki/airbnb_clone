@@ -7,11 +7,11 @@ from flask_json import as_json
 @app.route('/', methods=['GET'])
 @as_json
 def index():
-    return dict(
-        status="OK", 
-        utc_time=datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S"),
-        time=datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    )
+	return dict(
+		status="OK", 
+		utc_time=datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S"),
+		time=datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+	)
 
 def before_request():
     db.connect()
@@ -19,7 +19,7 @@ def before_request():
 def after_request():
     db.close()
 
-'''an error handler for incorrect request'''
+'''an error handler for unknown requests'''
 @app.errorhandler(404)
 @as_json
 def not_found(error=None):

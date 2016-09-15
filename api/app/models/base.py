@@ -2,7 +2,6 @@ from peewee import *
 from datetime import datetime
 import config
 
-# Defines MySQLDatabase details, either production, development or test, depending on the configuration
 db = MySQLDatabase(
     host=config.DATABASE['host'], 
     port=config.DATABASE['port'], 

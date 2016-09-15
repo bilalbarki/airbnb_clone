@@ -20,7 +20,7 @@ def pack():
     local('tar czf /tmp/%s.tar.gz .' % (name))
 
 def deploy():
-    test()
+    #test()
     # create a tarball from local source
     pack()
     # upload the source tarball to the temporary folder on the server
@@ -42,7 +42,7 @@ def deploy():
     local('rm -f /tmp/%s.tar.gz' % name)
 
 '''deploy api files to servers of Bilal Khan'''
-@hosts(bilal_hosts)  
+@hosts(bilal_hosts)
 def deploy_bilal():
     global env
     # custom directory for the ssh key
