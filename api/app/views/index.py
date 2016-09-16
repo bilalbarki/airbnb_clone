@@ -13,11 +13,14 @@ def index():
 		time=datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 	)
 
+@app.before_request
 def before_request():
     db.connect()
 
-def after_request():
+@app.after_request
+def after_request(response):
     db.close()
+    return response
 
 '''an error handler for unknown requests'''
 @app.errorhandler(404)
